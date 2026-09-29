@@ -1,5 +1,6 @@
 /**
- * GOG STUDIO - Ana Uygulama Mantığı (Filtreleme, Lightbox, Dokunmatik Hareketler, Mobil Drawer)
+ * GOG STUDIO - Ana Uygulama & Motion Motoru
+ * (Lenis Smooth Scroll + GSAP ScrollTrigger + Lightbox + Dokunmatik Hareketler)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -64,7 +65,42 @@ document.addEventListener("DOMContentLoaded", () => {
   const codeSnippetOutput = document.getElementById("codeSnippetOutput");
   const copyCodeBtn = document.getElementById("copyCodeBtn");
 
-  // 1. Header Scroll Shadow Effect
+  // ==========================================================================
+  // 1. Lenis Smooth Scroll & GSAP Integration
+  // ==========================================================================
+  let lenis = null;
+
+  if (typeof Lenis !== "undefined") {
+    lenis = new Lenis({
+      duration: 1.25,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: "vertical",
+      gestureOrientation: "vertical",
+      smoothWheel: true,
+      wheelMultiplier: 1.0,
+      touchMultiplier: 1.4,
+      infinite: false
+    });
+
+    // Synchronize Lenis with GSAP ScrollTrigger
+    if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
+      gsap.registerPlugin(ScrollTrigger);
+      lenis.on("scroll", ScrollTrigger.update);
+
+      gsap.ticker.add((time) => {
+        lenis.raf(time * 1000);
+      });
+      gsap.ticker.lagSmoothing(0);
+    } else {
+      function raf(time) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+      }
+      requestAnimationFrame(raf);
+    }
+  }
+
+  // Header Scroll Effect & Bottom Bar update
   window.addEventListener("scroll", () => {
     const header = document.querySelector(".site-header");
     if (window.scrollY > 25) {
@@ -75,13 +111,96 @@ document.addEventListener("DOMContentLoaded", () => {
     updateBottomNavActiveState();
   }, { passive: true });
 
-  // 2. Mobile Drawer Navigation Logic
+  // ==========================================================================
+  // 2. GSAP Cinematic Entrance & Scroll Animations
+  // ==========================================================================
+  function initMotionSequences() {
+    if (typeof gsap === "undefined") return;
+
+    // Check if user prefers reduced motion
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) return;
+
+    // A. Hero Section Cinematic Sequence
+    const heroTL = gsap.timeline({ defaults: { ease: "power3.out" } });
+    heroTL
+      .from(".site-header", { y: -25, opacity: 0, duration: 0.8 })
+      .from(".hero-tagline", { opacity: 0, x: -20, duration: 0.6 }, "-=0.4")
+      .from(".hero-title", { opacity: 0, y: 35, duration: 0.9 }, "-=0.4")
+      .from(".hero-desc", { opacity: 0, y: 20, duration: 0.7 }, "-=0.5")
+      .from(".hero-cta .btn", { opacity: 0, y: 20, stagger: 0.12, duration: 0.6 }, "-=0.4")
+      .from(".hero-stats .stat-item", { opacity: 0, y: 18, stagger: 0.08, duration: 0.6 }, "-=0.4")
+      .from(".hero-card", { opacity: 0, scale: 0.94, duration: 1.0, ease: "power2.out" }, "-=0.8");
+
+    // B. Series Section Scroll Trigger
+    if (typeof ScrollTrigger !== "undefined") {
+      gsap.from(".series-card", {
+        scrollTrigger: {
+          trigger: ".series-section",
+          start: "top 80%",
+          toggleActions: "play none none none"
+        },
+        opacity: 0,
+        y: 45,
+        duration: 0.8,
+        stagger: 0.12,
+        ease: "power2.out"
+      });
+
+      // C. Catalog Section Header Scroll Trigger
+      gsap.from(".catalog-section .section-header", {
+        scrollTrigger: {
+          trigger: ".catalog-section",
+          start: "top 85%",
+          toggleActions: "play none none none"
+        },
+        opacity: 0,
+        y: 30,
+        duration: 0.7,
+        ease: "power2.out"
+      });
+
+      // D. Studio Gear Cards Scroll Trigger
+      gsap.from(".gear-card", {
+        scrollTrigger: {
+          trigger: ".about-section",
+          start: "top 80%",
+          toggleActions: "play none none none"
+        },
+        opacity: 0,
+        y: 35,
+        duration: 0.7,
+        stagger: 0.1,
+        ease: "power2.out"
+      });
+    }
+
+    // E. Interactive Button Ripple Waves
+    document.querySelectorAll(".btn").forEach((btn) => {
+      btn.addEventListener("click", function (e) {
+        const circle = document.createElement("span");
+        circle.classList.add("ripple-wave");
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        circle.style.width = circle.style.height = `${size}px`;
+        circle.style.left = `${e.clientX - rect.left - size / 2}px`;
+        circle.style.top = `${e.clientY - rect.top - size / 2}px`;
+        this.appendChild(circle);
+        setTimeout(() => circle.remove(), 600);
+      });
+    });
+  }
+
+  // ==========================================================================
+  // 3. Mobile Drawer Navigation Logic
+  // ==========================================================================
   function openDrawer() {
     navMenu.classList.add("open");
     mobileDrawerOverlay.classList.add("active");
     mobileToggle.classList.add("active");
     mobileToggle.setAttribute("aria-expanded", "true");
     document.body.style.overflow = "hidden";
+    if (lenis) lenis.stop();
   }
 
   function closeDrawer() {
@@ -90,6 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
     mobileToggle.classList.remove("active");
     mobileToggle.setAttribute("aria-expanded", "false");
     document.body.style.overflow = "";
+    if (lenis) lenis.start();
   }
 
   if (mobileToggle) {
@@ -116,7 +236,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 3. View Mode Toggle (Feed / Large Cards vs Grid / Compact)
+  // ==========================================================================
+  // 4. View Mode Toggle (Feed / Large Cards vs Grid / Compact)
+  // ==========================================================================
   function applyViewMode(mode) {
     currentViewMode = mode;
     localStorage.setItem("gog_view_mode", mode);
@@ -135,7 +257,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   applyViewMode(currentViewMode);
 
-  // 4. Render Category Filter Chips
+  // ==========================================================================
+  // 5. Render Category Filter Chips
+  // ==========================================================================
   function renderCategoryChips() {
     if (!categoryChipsContainer) return;
     categoryChipsContainer.innerHTML = CATALOG_CATEGORIES.map(
@@ -151,13 +275,14 @@ document.addEventListener("DOMContentLoaded", () => {
         currentCategory = btn.dataset.category;
         renderCategoryChips();
         filterAndRenderMedia();
-        // Center active chip smoothly into view
         btn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
       });
     });
   }
 
-  // 5. Render Curated Series / Albums
+  // ==========================================================================
+  // 6. Render Curated Series / Albums
+  // ==========================================================================
   function renderCuratedSeries() {
     if (!seriesGrid) return;
     seriesGrid.innerHTML = CURATED_ALBUMS.map(
@@ -187,13 +312,19 @@ document.addEventListener("DOMContentLoaded", () => {
         filterAndRenderMedia();
         const catalogSec = document.getElementById("kataloglar");
         if (catalogSec) {
-          catalogSec.scrollIntoView({ behavior: "smooth" });
+          if (lenis) {
+            lenis.scrollTo(catalogSec);
+          } else {
+            catalogSec.scrollIntoView({ behavior: "smooth" });
+          }
         }
       });
     });
   }
 
-  // 6. Render Studio Gear Specs
+  // ==========================================================================
+  // 7. Render Studio Gear Specs
+  // ==========================================================================
   function renderStudioGear() {
     if (!gearGrid) return;
     gearGrid.innerHTML = STUDIO_GEAR.map(
@@ -210,7 +341,9 @@ document.addEventListener("DOMContentLoaded", () => {
     ).join("");
   }
 
-  // 7. Filter & Render Media Grid
+  // ==========================================================================
+  // 8. Filter & Render Media Grid with GSAP Stagger Animation
+  // ==========================================================================
   function filterAndRenderMedia() {
     filteredItems = MEDIA_ITEMS.filter((item) => {
       const matchesCategory =
@@ -324,6 +457,26 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .join("");
 
+    // GSAP Stagger Entrance for Cards
+    if (typeof gsap !== "undefined") {
+      gsap.fromTo(
+        ".media-card",
+        { opacity: 0, y: 25, scale: 0.96 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.5,
+          stagger: {
+            amount: 0.35,
+            grid: "auto",
+            from: "start"
+          },
+          ease: "power2.out"
+        }
+      );
+    }
+
     // Card click events
     mediaGrid.querySelectorAll(".media-card").forEach((card) => {
       card.addEventListener("click", (e) => {
@@ -343,6 +496,11 @@ document.addEventListener("DOMContentLoaded", () => {
         btn.classList.toggle("liked", isNowLiked);
         const svg = btn.querySelector("svg");
         if (svg) svg.setAttribute("fill", isNowLiked ? "currentColor" : "none");
+
+        // Micro-bounce with GSAP
+        if (typeof gsap !== "undefined") {
+          gsap.fromTo(btn, { scale: 1.3 }, { scale: 1, duration: 0.3, ease: "back.out(2)" });
+        }
       });
     });
   }
@@ -356,7 +514,9 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("gog_likes", JSON.stringify(likedItems));
   }
 
-  // 8. Lightbox Modal Functionality (with Mobile Swipe)
+  // ==========================================================================
+  // 9. Lightbox Modal Functionality (with Mobile Swipe & Smooth Open)
+  // ==========================================================================
   function openLightbox(index) {
     if (index < 0 || index >= filteredItems.length) return;
     currentLightboxIndex = index;
@@ -402,12 +562,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     lightboxModal.classList.add("active");
     document.body.style.overflow = "hidden";
+    if (lenis) lenis.stop();
+
+    // GSAP Modal Pop
+    if (typeof gsap !== "undefined" && lightboxContent) {
+      gsap.fromTo(
+        lightboxContent,
+        { scale: 0.94, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(1.2)" }
+      );
+    }
   }
 
   function closeLightbox() {
     lightboxModal.classList.remove("active");
     lightboxMediaViewer.innerHTML = "";
     document.body.style.overflow = "";
+    if (lenis) lenis.start();
     currentLightboxIndex = -1;
   }
 
@@ -468,7 +639,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 9. Touch Gestures on Lightbox (Swipe Left / Right / Down)
+  // Touch Gestures on Lightbox (Swipe Left / Right / Down)
   let touchStartX = 0;
   let touchStartY = 0;
   let touchEndX = 0;
@@ -493,21 +664,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const absX = Math.abs(deltaX);
     const absY = Math.abs(deltaY);
 
-    // Swipe horizontally (Next / Previous)
     if (absX > 45 && absX > absY) {
       if (deltaX < 0) {
-        showNextLightbox(); // Swiped left -> next
+        showNextLightbox(); // Swiped left
       } else {
-        showPrevLightbox(); // Swiped right -> prev
+        showPrevLightbox(); // Swiped right
       }
-    } 
-    // Swipe down on the top/viewer to dismiss
-    else if (deltaY > 80 && absY > absX) {
-      closeLightbox();
+    } else if (deltaY > 80 && absY > absX) {
+      closeLightbox(); // Swiped down
     }
   }
 
+  // ==========================================================================
   // 10. Filter Bar Listeners
+  // ==========================================================================
   typeToggleBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
       typeToggleBtns.forEach((b) => b.classList.remove("active"));
@@ -537,11 +707,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // ==========================================================================
   // 11. Quick Add Modal & Code Generator
+  // ==========================================================================
   function openQuickAdd() {
     if (quickAddModal) {
       quickAddModal.classList.add("active");
       document.body.style.overflow = "hidden";
+      if (lenis) lenis.stop();
       updateCodeSnippet();
     }
   }
@@ -550,6 +723,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (quickAddModal) {
       quickAddModal.classList.remove("active");
       document.body.style.overflow = "";
+      if (lenis) lenis.start();
     }
   }
 
@@ -654,11 +828,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 12. Mobile Bottom Bar Interactions
+  // ==========================================================================
+  // 12. Mobile Bottom Bar Interactions with Lenis Scroll
+  // ==========================================================================
   if (bNavHome) {
     bNavHome.addEventListener("click", (e) => {
       e.preventDefault();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (lenis) {
+        lenis.scrollTo(0);
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     });
   }
 
@@ -666,7 +846,13 @@ document.addEventListener("DOMContentLoaded", () => {
     bNavCatalog.addEventListener("click", (e) => {
       e.preventDefault();
       const catSec = document.getElementById("kataloglar");
-      if (catSec) catSec.scrollIntoView({ behavior: "smooth" });
+      if (catSec) {
+        if (lenis) {
+          lenis.scrollTo(catSec);
+        } else {
+          catSec.scrollIntoView({ behavior: "smooth" });
+        }
+      }
     });
   }
 
@@ -681,7 +867,13 @@ document.addEventListener("DOMContentLoaded", () => {
       typeToggleBtns.forEach((b) => b.classList.toggle("active", b.dataset.type === "video"));
       filterAndRenderMedia();
       const catSec = document.getElementById("kataloglar");
-      if (catSec) catSec.scrollIntoView({ behavior: "smooth" });
+      if (catSec) {
+        if (lenis) {
+          lenis.scrollTo(catSec);
+        } else {
+          catSec.scrollIntoView({ behavior: "smooth" });
+        }
+      }
     });
   }
 
@@ -689,7 +881,13 @@ document.addEventListener("DOMContentLoaded", () => {
     bNavAbout.addEventListener("click", (e) => {
       e.preventDefault();
       const aboutSec = document.getElementById("ekipman");
-      if (aboutSec) aboutSec.scrollIntoView({ behavior: "smooth" });
+      if (aboutSec) {
+        if (lenis) {
+          lenis.scrollTo(aboutSec);
+        } else {
+          aboutSec.scrollIntoView({ behavior: "smooth" });
+        }
+      }
     });
   }
 
@@ -714,9 +912,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Initial Runs
+  // ==========================================================================
+  // Initial Boot
+  // ==========================================================================
   renderCategoryChips();
   renderCuratedSeries();
   renderStudioGear();
   filterAndRenderMedia();
+  initMotionSequences();
 });
