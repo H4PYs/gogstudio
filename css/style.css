@@ -608,26 +608,28 @@ h1, h2, h3, h4, .brand-font {
 
 .series-card {
   position: relative;
-  background: var(--bg-card);
+  background: #15151c;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-subtle);
   overflow: hidden;
   cursor: pointer;
   transition: all var(--transition-smooth);
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .series-card:hover,
 .series-card:active {
-  border-color: rgba(255, 42, 59, 0.4);
+  border-color: rgba(255, 42, 59, 0.45);
   transform: translateY(-4px);
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 42, 59, 0.15);
 }
 
 .series-cover {
   height: 190px;
   position: relative;
   overflow: hidden;
-  background: #000;
+  background: #0d0d12;
 }
 
 .series-cover img {
@@ -635,6 +637,8 @@ h1, h2, h3, h4, .brand-font {
   height: 100%;
   object-fit: cover;
   transition: transform 0.5s ease;
+  opacity: 1 !important;
+  display: block;
 }
 
 .series-card:hover .series-cover img {

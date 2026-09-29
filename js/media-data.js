@@ -247,7 +247,7 @@ const CURATED_ALBUMS = [
     id: "album-red",
     title: "Red Spectrum // Kırmızı Spektrum",
     subtitle: "Kırmızı, siyah ve derin kontrastın görsel hikayesi",
-    cover: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
+    cover: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=800&q=85",
     count: "12 Eser",
     tag: "Özel Seri",
     categoryFilter: "all"

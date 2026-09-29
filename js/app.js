@@ -68,18 +68,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==========================================================================
   // 1. Lenis Smooth Scroll & GSAP Integration
   // ==========================================================================
+  // 1. Lenis Smooth Scroll (Desktop Only - Mobile uses 120Hz native touch scroll)
+  // ==========================================================================
   let lenis = null;
+  const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 768);
 
-  if (typeof Lenis !== "undefined") {
+  if (typeof Lenis !== "undefined" && !isTouchDevice) {
     lenis = new Lenis({
-      duration: 1.25,
+      duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: "vertical",
-      gestureOrientation: "vertical",
       smoothWheel: true,
-      wheelMultiplier: 1.0,
-      touchMultiplier: 1.4,
-      infinite: false
+      syncTouch: false
     });
 
     // Synchronize Lenis with GSAP ScrollTrigger
@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }, { passive: true });
 
   // ==========================================================================
-  // 2. GSAP Cinematic Entrance & Scroll Animations
+  // 2. GSAP Cinematic Entrance & Micro-Interactions (Safe & Reliable)
   // ==========================================================================
   function initMotionSequences() {
     if (typeof gsap === "undefined") return;
@@ -132,50 +132,44 @@ document.addEventListener("DOMContentLoaded", () => {
       .from(".hero-stats .stat-item", { opacity: 0, y: 18, stagger: 0.08, duration: 0.6 }, "-=0.4")
       .from(".hero-card", { opacity: 0, scale: 0.94, duration: 1.0, ease: "power2.out" }, "-=0.8");
 
-    // B. Series Section Scroll Trigger
-    if (typeof ScrollTrigger !== "undefined") {
-      gsap.from(".series-card", {
-        scrollTrigger: {
-          trigger: ".series-section",
-          start: "top 80%",
-          toggleActions: "play none none none"
-        },
-        opacity: 0,
-        y: 45,
-        duration: 0.8,
-        stagger: 0.12,
-        ease: "power2.out"
-      });
+    // B. Desktop Scroll Reveals (Never hide cards on mobile touch devices)
+    if (typeof ScrollTrigger !== "undefined" && !isTouchDevice) {
+      gsap.fromTo(
+        ".series-card",
+        { opacity: 0, y: 35 },
+        {
+          scrollTrigger: {
+            trigger: ".series-section",
+            start: "top 85%",
+            toggleActions: "play none none none"
+          },
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          stagger: 0.1,
+          ease: "power2.out"
+        }
+      );
 
-      // C. Catalog Section Header Scroll Trigger
-      gsap.from(".catalog-section .section-header", {
-        scrollTrigger: {
-          trigger: ".catalog-section",
-          start: "top 85%",
-          toggleActions: "play none none none"
-        },
-        opacity: 0,
-        y: 30,
-        duration: 0.7,
-        ease: "power2.out"
-      });
-
-      // D. Studio Gear Cards Scroll Trigger
-      gsap.from(".gear-card", {
-        scrollTrigger: {
-          trigger: ".about-section",
-          start: "top 80%",
-          toggleActions: "play none none none"
-        },
-        opacity: 0,
-        y: 35,
-        duration: 0.7,
-        stagger: 0.1,
-        ease: "power2.out"
-      });
+      gsap.fromTo(
+        ".gear-card",
+        { opacity: 0, y: 30 },
+        {
+          scrollTrigger: {
+            trigger: ".about-section",
+            start: "top 85%",
+            toggleActions: "play none none none"
+          },
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.08,
+          ease: "power2.out"
+        }
+      );
     }
 
-    // E. Interactive Button Ripple Waves
+    // C. Interactive Button Ripple Waves
     document.querySelectorAll(".btn").forEach((btn) => {
       btn.addEventListener("click", function (e) {
         const circle = document.createElement("span");
