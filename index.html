@@ -2,10 +2,12 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>GOG STUDIO — Fotoğraf ve Video Kataloğu</title>
   <meta name="description" content="GOG STUDIO - Fotoğraf, sinematik video, reels ve görsel arşiv kataloğu. Kırmızı, siyah, beyaz ve gri tonlarıyla modern görsel stüdyo.">
   <meta name="theme-color" content="#08080a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
@@ -24,6 +26,9 @@
   <div class="bg-ambient-glow" aria-hidden="true"></div>
   <div class="bg-ambient-glow-bottom" aria-hidden="true"></div>
 
+  <!-- Mobile Drawer Backdrop Overlay -->
+  <div class="mobile-drawer-overlay" id="mobileDrawerOverlay" aria-hidden="true"></div>
+
   <!-- ==========================================================================
        Header / Navbar
        ========================================================================== -->
@@ -34,13 +39,33 @@
         <img src="assets/logo.svg" alt="GOG STUDIO Logo" class="brand-logo-img">
       </a>
 
-      <!-- Navigation Links -->
-      <nav>
+      <!-- Desktop & Mobile Navigation Links -->
+      <nav class="nav-wrapper">
         <ul class="nav-menu" id="navMenu">
-          <li><a href="#kataloglar" class="nav-link">Kataloglar</a></li>
-          <li><a href="#seriler" class="nav-link">Seriler &amp; Albümler</a></li>
-          <li><a href="#ekipman" class="nav-link">Ekipman &amp; Stüdyo</a></li>
-          <li><a href="#iletisim" class="nav-link">İletişim</a></li>
+          <li class="mobile-drawer-header">
+            <span class="drawer-title">GOG STUDIO</span>
+            <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Menüyü Kapat">&times;</button>
+          </li>
+          <li><a href="#kataloglar" class="nav-link"><span class="nav-icon">🗂️</span><span>Kataloglar</span></a></li>
+          <li><a href="#seriler" class="nav-link"><span class="nav-icon">🎞️</span><span>Seriler &amp; Albümler</span></a></li>
+          <li><a href="#ekipman" class="nav-link"><span class="nav-icon">📷</span><span>Ekipman &amp; Stüdyo</span></a></li>
+          <li><a href="#iletisim" class="nav-link"><span class="nav-icon">✉️</span><span>İletişim</span></a></li>
+          <li class="mobile-drawer-footer">
+            <button class="btn btn-primary" id="mobileDrawerAddBtn" style="width: 100%;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>Yeni Medya Ekle</span>
+            </button>
+            <div class="drawer-socials">
+              <a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a>
+              <span>•</span>
+              <a href="https://youtube.com" target="_blank" rel="noopener">YouTube</a>
+              <span>•</span>
+              <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+            </div>
+          </li>
         </ul>
       </nav>
 
@@ -48,24 +73,23 @@
       <div class="nav-actions">
         <div class="pulse-badge" title="Canlı Katalog">
           <span class="pulse-dot"></span>
-          <span>ARŞİV AKTİF</span>
+          <span class="badge-text">ARŞİV AKTİF</span>
         </div>
 
-        <button class="btn btn-primary btn-sm" id="openQuickAddBtn" title="Kendi medyanızı ekleyin veya kod üretin">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <button class="btn btn-primary btn-sm nav-add-btn" id="openQuickAddBtn" title="Kendi medyanızı ekleyin veya kod üretin">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
-          <span>Medya Ekle</span>
+          <span class="btn-text-desktop">Medya Ekle</span>
+          <span class="btn-text-mobile">Ekle</span>
         </button>
 
         <!-- Mobile Menu Hamburger -->
-        <button class="mobile-toggle" id="mobileToggle" aria-label="Menüyü Aç/Kapat">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Menüyü Aç/Kapat" aria-expanded="false">
+          <span class="hamburger-bar bar-1"></span>
+          <span class="hamburger-bar bar-2"></span>
+          <span class="hamburger-bar bar-3"></span>
         </button>
       </div>
     </div>
@@ -79,7 +103,8 @@
       <div class="container hero-grid">
         <div class="hero-content">
           <div class="hero-tagline">
-            <span>// VISUAL ARTS &amp; MEDIA ARCHIVE</span>
+            <span class="tagline-dot"></span>
+            <span>VISUAL ARTS &amp; MEDIA ARCHIVE</span>
           </div>
 
           <h1 class="hero-title">
@@ -92,7 +117,7 @@
           </p>
 
           <div class="hero-cta">
-            <a href="#kataloglar" class="btn btn-primary">
+            <a href="#kataloglar" class="btn btn-primary hero-btn-main">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="3" width="7" height="7"></rect>
                 <rect x="14" y="3" width="7" height="7"></rect>
@@ -102,7 +127,7 @@
               <span>Kataloğu Keşfet</span>
             </a>
 
-            <button class="btn btn-outline" id="heroAddBtn">
+            <button class="btn btn-outline hero-btn-sub" id="heroAddBtn">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="8" x2="12" y2="16"></line>
@@ -112,6 +137,7 @@
             </button>
           </div>
 
+          <!-- Responsive Stats Grid (2x2 on mobile, 4 columns on desktop) -->
           <div class="hero-stats">
             <div class="stat-item">
               <span class="stat-num">4K</span>
@@ -135,7 +161,7 @@
         <!-- Hero Featured Media Card -->
         <div class="hero-showcase">
           <div class="hero-card" onclick="document.querySelector('.media-card[data-index=\'0\']')?.click()">
-            <img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=1200&q=85" alt="Öne Çıkan Seri - Tokyo Gece Sokakları">
+            <img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=1200&q=85" alt="Öne Çıkan Seri - Tokyo Gece Sokakları" loading="eager">
             <span class="hero-card-badge">Öne Çıkan Kadraj</span>
             <div class="hero-card-overlay">
               <h3 style="font-size: 1.25rem; font-weight: 700;">Karanlık Şehir &amp; Neon Yansımalar</h3>
@@ -165,8 +191,14 @@
           </p>
         </div>
 
-        <div class="series-grid" id="seriesGrid">
-          <!-- Populated dynamically via app.js -->
+        <!-- Touch-friendly Horizontal Swiper on Mobile, Grid on Desktop -->
+        <div class="series-grid-wrapper">
+          <div class="series-grid" id="seriesGrid">
+            <!-- Populated dynamically via app.js -->
+          </div>
+        </div>
+        <div class="mobile-swipe-indicator" aria-hidden="true">
+          <span>👈 Sağa-sola kaydırarak serileri keşfedin 👉</span>
         </div>
       </div>
     </section>
@@ -191,7 +223,7 @@
         <!-- Filter & Search Controls -->
         <div class="catalog-filter-bar">
           <div class="filter-top-row">
-            <!-- Search Box -->
+            <!-- Search Box with Clear Button -->
             <div class="search-box">
               <span class="search-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -199,7 +231,8 @@
                   <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
               </span>
-              <input type="text" id="searchInput" class="search-input" placeholder="Başlık, etiket, kamera veya konum ara...">
+              <input type="text" id="searchInput" class="search-input" placeholder="Fotoğraf, video veya etiket ara..." autocomplete="off">
+              <button class="search-clear-btn" id="searchClearBtn" aria-label="Aramayı Temizle" style="display: none;">&times;</button>
             </div>
 
             <!-- Media Type Selector -->
@@ -224,22 +257,40 @@
             </div>
           </div>
 
-          <!-- Category Chips -->
-          <div class="category-chips" id="categoryChips">
-            <!-- Populated via app.js -->
+          <!-- Category Chips with Smooth Touch Scroll -->
+          <div class="category-chips-wrapper">
+            <div class="category-chips" id="categoryChips">
+              <!-- Populated via app.js -->
+            </div>
           </div>
         </div>
 
-        <!-- Results Count Info -->
+        <!-- Results Count & View Mode Switcher -->
         <div class="catalog-stats-bar">
           <div id="resultCount">Yükleniyor...</div>
-          <div style="font-size: 0.8rem; color: var(--color-gray-500);">
-            İpucu: Bir medyaya tıklayarak tam ekran inceleyebilir veya oynatabilirsiniz.
+          
+          <div class="stats-right-controls">
+            <!-- View Mode Switcher for Mobile & Desktop -->
+            <div class="view-mode-toggle" id="viewModeToggle" aria-label="Görünüm Modu">
+              <button class="view-btn active" data-view="feed" title="Büyük Kart Akışı" aria-label="Tekli Akış">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                </svg>
+              </button>
+              <button class="view-btn" data-view="grid" title="Kompakt 2'li Izgara" aria-label="İkili Izgara">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="3" y="3" width="8" height="8" rx="1.5"></rect>
+                  <rect x="13" y="3" width="8" height="8" rx="1.5"></rect>
+                  <rect x="3" y="13" width="8" height="8" rx="1.5"></rect>
+                  <rect x="13" y="13" width="8" height="8" rx="1.5"></rect>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
         <!-- Media Grid -->
-        <div class="media-grid" id="mediaGrid">
+        <div class="media-grid view-feed" id="mediaGrid">
           <!-- Populated via app.js -->
         </div>
       </div>
@@ -262,7 +313,7 @@
             Kırmızı rengin enerjisi, siyahın derinliği ve monokrom grilerin yarattığı keskin atmosfer, tüm çalışmaların temel vizyonunu oluşturur. Burada yer alan her kare ve video klip, anı yakalamak ve estetik bir anlatım kurmak amacıyla kurgulanmıştır.
           </p>
           
-          <div style="display: flex; gap: 12px; margin-top: 24px;">
+          <div class="about-action-btns">
             <a href="https://github.com" target="_blank" rel="noopener" class="btn btn-outline btn-sm">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
@@ -293,29 +344,36 @@
   </main>
 
   <!-- ==========================================================================
-       Lightbox Fullscreen Modal
+       Lightbox Fullscreen Modal (Mobile Touch & Swipe Enabled)
        ========================================================================== -->
   <div class="lightbox-modal" id="lightboxModal" role="dialog" aria-modal="true" aria-label="Medya Görüntüleyici">
-    <button class="lightbox-close-btn" id="lightboxCloseBtn" title="Kapat (ESC)">
-      &times;
-    </button>
+    <!-- Top Mobile Control Bar -->
+    <div class="lightbox-top-bar">
+      <div class="lightbox-counter" id="lightboxCounter">1 / 12</div>
+      <button class="lightbox-close-btn" id="lightboxCloseBtn" title="Kapat (ESC veya Aşağı Kaydır)" aria-label="Kapat">
+        &times;
+      </button>
+    </div>
 
-    <div class="lightbox-content">
+    <div class="lightbox-content" id="lightboxContent">
       <!-- Media Viewer Area -->
       <div class="lightbox-media-viewer" id="lightboxMediaViewer">
         <!-- Rendered dynamically (img or video) -->
       </div>
 
-      <!-- Navigation Arrows -->
-      <button class="lightbox-nav-btn lightbox-prev" id="lightboxPrevBtn" title="Önceki (Sol Ok)">
+      <!-- Navigation Arrows (Hidden or touch-accessible on mobile) -->
+      <button class="lightbox-nav-btn lightbox-prev" id="lightboxPrevBtn" title="Önceki (Sol Ok)" aria-label="Önceki">
         &#10094;
       </button>
-      <button class="lightbox-nav-btn lightbox-next" id="lightboxNextBtn" title="Sonraki (Sağ Ok)">
+      <button class="lightbox-nav-btn lightbox-next" id="lightboxNextBtn" title="Sonraki (Sağ Ok)" aria-label="Sonraki">
         &#10095;
       </button>
 
       <!-- Sidebar Metadata Area -->
       <div class="lightbox-sidebar">
+        <!-- Drag Handle for Mobile Bottom Sheet -->
+        <div class="sheet-drag-handle" aria-hidden="true"></div>
+
         <span class="lightbox-meta-badge" id="lightboxCategory">Kategori</span>
         <h2 class="lightbox-title" id="lightboxTitle">Başlık</h2>
         <p class="lightbox-desc" id="lightboxDesc">Açıklama</p>
@@ -343,12 +401,24 @@
           <!-- Tag chips -->
         </div>
 
-        <div style="margin-top: auto; padding-top: 16px;">
-          <button class="btn btn-outline btn-sm" onclick="alert('Medya bağlantısı panoya kopyalandı!')" style="width: 100%;">
-            <span>Paylaş / Bağlantıyı Kopyala</span>
+        <div class="lightbox-action-row">
+          <button class="btn btn-outline btn-sm" id="lightboxShareBtn" style="width: 100%;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+            </svg>
+            <span>Bağlantıyı Kopyala</span>
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- Mobile Swipe Helper Pill -->
+    <div class="lightbox-mobile-hint">
+      <span>👈 Sağa/Sola kaydırarak geçin • Aşağı kaydırarak kapatın</span>
     </div>
   </div>
 
@@ -357,6 +427,7 @@
        ========================================================================== -->
   <div class="modal-overlay" id="quickAddModal" role="dialog" aria-modal="true" aria-label="Medya Ekleme Paneli">
     <div class="modal-card">
+      <div class="modal-sheet-handle" aria-hidden="true"></div>
       <div class="modal-header">
         <div>
           <h3 style="font-size: 1.25rem; font-weight: 700;">Hızlı Medya Ekle &amp; Önizle</h3>
@@ -364,7 +435,7 @@
             Kendi fotoğrafınızı veya videonuzu yükleyip hemen test edebilirsiniz.
           </p>
         </div>
-        <button class="modal-close-btn" id="closeQuickAddBtn">&times;</button>
+        <button class="modal-close-btn" id="closeQuickAddBtn" aria-label="Kapat">&times;</button>
       </div>
 
       <form id="quickAddForm">
@@ -395,8 +466,8 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="addLocalFile">Bilgisayardan Dosya Seç (Önizleme)</label>
-          <input type="file" class="form-control" id="addLocalFile" accept="image/*,video/*">
+          <label class="form-label" for="addLocalFile">Bilgisayardan / Telefondan Dosya Seç</label>
+          <input type="file" class="form-control file-input-styled" id="addLocalFile" accept="image/*,video/*">
         </div>
 
         <div class="form-group">
@@ -407,7 +478,7 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" for="addGear">Kamera / Ekipman</label>
-            <input type="text" class="form-control" id="addGear" placeholder="Örn: Sony A7 IV · 35mm f/1.4">
+            <input type="text" class="form-control" id="addGear" placeholder="Örn: Sony A7 IV / iPhone 15 Pro">
           </div>
           <div class="form-group">
             <label class="form-label" for="addDesc">Kısa Açıklama</label>
@@ -415,7 +486,7 @@
           </div>
         </div>
 
-        <div style="display: flex; gap: 12px; margin-top: 10px;">
+        <div class="form-action-row">
           <button type="submit" class="btn btn-primary" style="flex: 1;">
             <span>Galeriye Geçici Ekle</span>
           </button>
@@ -432,6 +503,55 @@
       </form>
     </div>
   </div>
+
+  <!-- ==========================================================================
+       Native App-like Mobile Bottom Navigation Bar
+       ========================================================================== -->
+  <nav class="mobile-bottom-bar" id="mobileBottomBar" aria-label="Mobil Gezinme">
+    <a href="#" class="bottom-nav-item active" id="bNavHome" data-target="home">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span>Ana Sayfa</span>
+    </a>
+
+    <a href="#kataloglar" class="bottom-nav-item" id="bNavCatalog" data-target="catalog">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7"></rect>
+        <rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect>
+        <rect x="3" y="14" width="7" height="7"></rect>
+      </svg>
+      <span>Katalog</span>
+    </a>
+
+    <!-- Center Highlighted Add Button -->
+    <button class="bottom-nav-add-btn" id="bNavAdd" aria-label="Yeni Medya Ekle">
+      <div class="bottom-add-circle">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </div>
+    </button>
+
+    <button class="bottom-nav-item" id="bNavVideos" data-target="videos">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+      </svg>
+      <span>Videolar</span>
+    </button>
+
+    <a href="#ekipman" class="bottom-nav-item" id="bNavAbout" data-target="about">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+      <span>Stüdyo</span>
+    </a>
+  </nav>
 
   <!-- ==========================================================================
        Footer

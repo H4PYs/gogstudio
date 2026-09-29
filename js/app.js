@@ -1,5 +1,5 @@
 /**
- * GOG STUDIO - Ana Uygulama Mantığı (Filtreleme, Lightbox, Video Oynatıcı, Arama)
+ * GOG STUDIO - Ana Uygulama Mantığı (Filtreleme, Lightbox, Dokunmatik Hareketler, Mobil Drawer)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -10,22 +10,41 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentLightboxIndex = -1;
   let filteredItems = [...MEDIA_ITEMS];
   let likedItems = JSON.parse(localStorage.getItem("gog_likes") || "[]");
+  let currentViewMode = localStorage.getItem("gog_view_mode") || "feed"; // 'feed' | 'grid'
 
   // DOM Elements
   const mediaGrid = document.getElementById("mediaGrid");
   const categoryChipsContainer = document.getElementById("categoryChips");
   const typeToggleBtns = document.querySelectorAll(".type-toggle-btn");
   const searchInput = document.getElementById("searchInput");
+  const searchClearBtn = document.getElementById("searchClearBtn");
   const resultCountEl = document.getElementById("resultCount");
   const seriesGrid = document.getElementById("seriesGrid");
   const gearGrid = document.getElementById("gearGrid");
+  const viewModeBtns = document.querySelectorAll(".view-btn");
+
+  // Mobile Drawer Elements
+  const mobileToggle = document.getElementById("mobileToggle");
+  const navMenu = document.getElementById("navMenu");
+  const mobileDrawerOverlay = document.getElementById("mobileDrawerOverlay");
+  const drawerCloseBtn = document.getElementById("drawerCloseBtn");
+  const mobileDrawerAddBtn = document.getElementById("mobileDrawerAddBtn");
+
+  // Mobile Bottom Bar Elements
+  const bNavHome = document.getElementById("bNavHome");
+  const bNavCatalog = document.getElementById("bNavCatalog");
+  const bNavAdd = document.getElementById("bNavAdd");
+  const bNavVideos = document.getElementById("bNavVideos");
+  const bNavAbout = document.getElementById("bNavAbout");
 
   // Lightbox Elements
   const lightboxModal = document.getElementById("lightboxModal");
+  const lightboxContent = document.getElementById("lightboxContent");
   const lightboxMediaViewer = document.getElementById("lightboxMediaViewer");
   const lightboxCloseBtn = document.getElementById("lightboxCloseBtn");
   const lightboxPrevBtn = document.getElementById("lightboxPrevBtn");
   const lightboxNextBtn = document.getElementById("lightboxNextBtn");
+  const lightboxCounter = document.getElementById("lightboxCounter");
   const lightboxTitle = document.getElementById("lightboxTitle");
   const lightboxDesc = document.getElementById("lightboxDesc");
   const lightboxCategory = document.getElementById("lightboxCategory");
@@ -34,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const lightboxLocation = document.getElementById("lightboxLocation");
   const lightboxDate = document.getElementById("lightboxDate");
   const lightboxTags = document.getElementById("lightboxTags");
+  const lightboxShareBtn = document.getElementById("lightboxShareBtn");
 
   // Quick Add Modal Elements
   const quickAddModal = document.getElementById("quickAddModal");
@@ -44,32 +64,78 @@ document.addEventListener("DOMContentLoaded", () => {
   const codeSnippetOutput = document.getElementById("codeSnippetOutput");
   const copyCodeBtn = document.getElementById("copyCodeBtn");
 
-  // Mobile Navigation
-  const mobileToggle = document.getElementById("mobileToggle");
-  const navMenu = document.getElementById("navMenu");
-
-  // 1. Initialize Header Scroll Effect
+  // 1. Header Scroll Shadow Effect
   window.addEventListener("scroll", () => {
     const header = document.querySelector(".site-header");
-    if (window.scrollY > 30) {
+    if (window.scrollY > 25) {
       header.classList.add("scrolled");
     } else {
       header.classList.remove("scrolled");
     }
-  });
+    updateBottomNavActiveState();
+  }, { passive: true });
 
-  // Mobile Menu Toggle
-  if (mobileToggle && navMenu) {
+  // 2. Mobile Drawer Navigation Logic
+  function openDrawer() {
+    navMenu.classList.add("open");
+    mobileDrawerOverlay.classList.add("active");
+    mobileToggle.classList.add("active");
+    mobileToggle.setAttribute("aria-expanded", "true");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeDrawer() {
+    navMenu.classList.remove("open");
+    mobileDrawerOverlay.classList.remove("active");
+    mobileToggle.classList.remove("active");
+    mobileToggle.setAttribute("aria-expanded", "false");
+    document.body.style.overflow = "";
+  }
+
+  if (mobileToggle) {
     mobileToggle.addEventListener("click", () => {
-      navMenu.classList.toggle("open");
-    });
-    // Close menu when clicking links
-    navMenu.querySelectorAll(".nav-link").forEach((link) => {
-      link.addEventListener("click", () => navMenu.classList.remove("open"));
+      if (navMenu.classList.contains("open")) {
+        closeDrawer();
+      } else {
+        openDrawer();
+      }
     });
   }
 
-  // 2. Render Category Filter Chips
+  if (drawerCloseBtn) drawerCloseBtn.addEventListener("click", closeDrawer);
+  if (mobileDrawerOverlay) mobileDrawerOverlay.addEventListener("click", closeDrawer);
+
+  navMenu.querySelectorAll(".nav-link").forEach((link) => {
+    link.addEventListener("click", closeDrawer);
+  });
+
+  if (mobileDrawerAddBtn) {
+    mobileDrawerAddBtn.addEventListener("click", () => {
+      closeDrawer();
+      openQuickAdd();
+    });
+  }
+
+  // 3. View Mode Toggle (Feed / Large Cards vs Grid / Compact)
+  function applyViewMode(mode) {
+    currentViewMode = mode;
+    localStorage.setItem("gog_view_mode", mode);
+    mediaGrid.classList.remove("view-feed", "view-grid");
+    mediaGrid.classList.add(`view-${mode}`);
+
+    viewModeBtns.forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.view === mode);
+    });
+  }
+
+  viewModeBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      applyViewMode(btn.dataset.view);
+    });
+  });
+  applyViewMode(currentViewMode);
+
+  // 4. Render Category Filter Chips
   function renderCategoryChips() {
     if (!categoryChipsContainer) return;
     categoryChipsContainer.innerHTML = CATALOG_CATEGORIES.map(
@@ -85,11 +151,13 @@ document.addEventListener("DOMContentLoaded", () => {
         currentCategory = btn.dataset.category;
         renderCategoryChips();
         filterAndRenderMedia();
+        // Center active chip smoothly into view
+        btn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
       });
     });
   }
 
-  // 3. Render Curated Series / Albums
+  // 5. Render Curated Series / Albums
   function renderCuratedSeries() {
     if (!seriesGrid) return;
     seriesGrid.innerHTML = CURATED_ALBUMS.map(
@@ -117,7 +185,6 @@ document.addEventListener("DOMContentLoaded", () => {
         currentCategory = cat || "all";
         renderCategoryChips();
         filterAndRenderMedia();
-        // Scroll smoothly to catalog section
         const catalogSec = document.getElementById("kataloglar");
         if (catalogSec) {
           catalogSec.scrollIntoView({ behavior: "smooth" });
@@ -126,7 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 4. Render Studio Gear Specs
+  // 6. Render Studio Gear Specs
   function renderStudioGear() {
     if (!gearGrid) return;
     gearGrid.innerHTML = STUDIO_GEAR.map(
@@ -143,18 +210,15 @@ document.addEventListener("DOMContentLoaded", () => {
     ).join("");
   }
 
-  // 5. Filter & Render Media Grid
+  // 7. Filter & Render Media Grid
   function filterAndRenderMedia() {
     filteredItems = MEDIA_ITEMS.filter((item) => {
-      // Category match
       const matchesCategory =
         currentCategory === "all" || item.category === currentCategory;
 
-      // Type match
       const matchesType =
         currentType === "all" || item.type === currentType;
 
-      // Search match
       const q = searchQuery.toLowerCase().trim();
       const matchesSearch =
         !q ||
@@ -191,6 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
           currentType = "all";
           searchQuery = "";
           if (searchInput) searchInput.value = "";
+          if (searchClearBtn) searchClearBtn.style.display = "none";
           typeToggleBtns.forEach((b) =>
             b.classList.toggle("active", b.dataset.type === "all")
           );
@@ -220,7 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
             <button class="card-like-btn ${isLiked ? "liked" : ""}" data-id="${item.id}" title="Favorilere Ekle" aria-label="Favori">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="${isLiked ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="${isLiked ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
               </svg>
             </button>
@@ -230,7 +295,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 ? `
               <div class="video-play-overlay">
                 <div class="play-circle">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
                   </svg>
                 </div>
@@ -244,8 +309,8 @@ document.addEventListener("DOMContentLoaded", () => {
             <h3 class="media-card-title">${item.title}</h3>
             <p class="media-card-desc">${item.description || ""}</p>
             <div class="media-card-meta">
-              <span class="media-gear">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <span class="media-gear" title="${item.gear || ""}">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                   <circle cx="12" cy="13" r="4"></circle>
                 </svg>
@@ -259,16 +324,16 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .join("");
 
-    // Attach Click Handlers to cards & likes
+    // Card click events
     mediaGrid.querySelectorAll(".media-card").forEach((card) => {
       card.addEventListener("click", (e) => {
-        // Prevent opening lightbox if like button was clicked
         if (e.target.closest(".card-like-btn")) return;
         const index = parseInt(card.dataset.index, 10);
         openLightbox(index);
       });
     });
 
+    // Like buttons
     mediaGrid.querySelectorAll(".card-like-btn").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -282,7 +347,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Toggle Like with LocalStorage
   function toggleLike(id) {
     if (likedItems.includes(id)) {
       likedItems = likedItems.filter((i) => i !== id);
@@ -292,23 +356,28 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("gog_likes", JSON.stringify(likedItems));
   }
 
-  // 6. Lightbox Modal Functionality
+  // 8. Lightbox Modal Functionality (with Mobile Swipe)
   function openLightbox(index) {
     if (index < 0 || index >= filteredItems.length) return;
     currentLightboxIndex = index;
     const item = filteredItems[index];
 
-    // Render media in viewer
+    // Counter
+    if (lightboxCounter) {
+      lightboxCounter.textContent = `${index + 1} / ${filteredItems.length}`;
+    }
+
+    // Media Viewer
     if (item.type === "video") {
       lightboxMediaViewer.innerHTML = `
-        <video controls autoplay loop playsinline style="max-height: 80vh; max-width: 95%;">
+        <video controls autoplay loop playsinline webkit-playsinline style="max-height: 80vh; max-width: 96%; width: 100%;">
           <source src="${item.src}" type="video/mp4">
           Tarayıcınız video etiketini desteklemiyor.
         </video>
       `;
     } else {
       lightboxMediaViewer.innerHTML = `
-        <img src="${item.src}" alt="${item.title}" style="max-height: 85vh; max-width: 95%; object-fit: contain;" />
+        <img src="${item.src}" alt="${item.title}" style="max-height: 82vh; max-width: 96%; object-fit: contain;" />
       `;
     }
 
@@ -318,7 +387,7 @@ document.addEventListener("DOMContentLoaded", () => {
     lightboxTitle.textContent = item.title;
     lightboxDesc.textContent = item.description || "GOG Studio özel katalog çalışması.";
     lightboxGear.textContent = item.gear || "Belirtilmemiş";
-    lightboxRes.textContent = item.resolution || (item.type === "video" ? "4K Video" : "Yüksek Çözünürlük");
+    lightboxRes.textContent = item.resolution || (item.type === "video" ? "4K 60FPS Video" : "Yüksek Çözünürlük");
     lightboxLocation.textContent = item.location || "İstanbul / Studio";
     lightboxDate.textContent = item.date || "2026";
 
@@ -332,12 +401,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     lightboxModal.classList.add("active");
-    document.body.style.overflow = "hidden"; // Prevent background scroll
+    document.body.style.overflow = "hidden";
   }
 
   function closeLightbox() {
     lightboxModal.classList.remove("active");
-    lightboxMediaViewer.innerHTML = ""; // Stop video playback
+    lightboxMediaViewer.innerHTML = "";
     document.body.style.overflow = "";
     currentLightboxIndex = -1;
   }
@@ -346,7 +415,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (currentLightboxIndex < filteredItems.length - 1) {
       openLightbox(currentLightboxIndex + 1);
     } else {
-      openLightbox(0); // loop
+      openLightbox(0);
     }
   }
 
@@ -354,21 +423,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (currentLightboxIndex > 0) {
       openLightbox(currentLightboxIndex - 1);
     } else {
-      openLightbox(filteredItems.length - 1); // loop
+      openLightbox(filteredItems.length - 1);
     }
   }
 
-  // Lightbox Event Listeners
   if (lightboxCloseBtn) lightboxCloseBtn.addEventListener("click", closeLightbox);
   if (lightboxNextBtn) lightboxNextBtn.addEventListener("click", showNextLightbox);
   if (lightboxPrevBtn) lightboxPrevBtn.addEventListener("click", showPrevLightbox);
 
-  // Close lightbox on backdrop click
+  // Close when clicking modal backdrop
   if (lightboxModal) {
     lightboxModal.addEventListener("click", (e) => {
-      if (e.target === lightboxModal) {
-        closeLightbox();
-      }
+      if (e.target === lightboxModal) closeLightbox();
     });
   }
 
@@ -380,7 +446,68 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "ArrowLeft") showPrevLightbox();
   });
 
-  // 7. Event Listeners for Filters
+  // Share button in lightbox
+  if (lightboxShareBtn) {
+    lightboxShareBtn.addEventListener("click", () => {
+      const shareUrl = window.location.href;
+      if (navigator.share) {
+        navigator.share({
+          title: "GOG STUDIO",
+          text: "GOG STUDIO Fotoğraf & Video Kataloğunu İnceleyin",
+          url: shareUrl
+        }).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          const originalText = lightboxShareBtn.innerHTML;
+          lightboxShareBtn.innerHTML = `<span>✓ Bağlantı Kopyalandı!</span>`;
+          setTimeout(() => {
+            lightboxShareBtn.innerHTML = originalText;
+          }, 2000);
+        });
+      }
+    });
+  }
+
+  // 9. Touch Gestures on Lightbox (Swipe Left / Right / Down)
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchEndX = 0;
+  let touchEndY = 0;
+
+  if (lightboxModal) {
+    lightboxModal.addEventListener("touchstart", (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    lightboxModal.addEventListener("touchend", (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      touchEndY = e.changedTouches[0].screenY;
+      handleLightboxSwipe();
+    }, { passive: true });
+  }
+
+  function handleLightboxSwipe() {
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+
+    // Swipe horizontally (Next / Previous)
+    if (absX > 45 && absX > absY) {
+      if (deltaX < 0) {
+        showNextLightbox(); // Swiped left -> next
+      } else {
+        showPrevLightbox(); // Swiped right -> prev
+      }
+    } 
+    // Swipe down on the top/viewer to dismiss
+    else if (deltaY > 80 && absY > absX) {
+      closeLightbox();
+    }
+  }
+
+  // 10. Filter Bar Listeners
   typeToggleBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
       typeToggleBtns.forEach((b) => b.classList.remove("active"));
@@ -393,11 +520,24 @@ document.addEventListener("DOMContentLoaded", () => {
   if (searchInput) {
     searchInput.addEventListener("input", (e) => {
       searchQuery = e.target.value;
+      if (searchClearBtn) {
+        searchClearBtn.style.display = searchQuery.length > 0 ? "block" : "none";
+      }
       filterAndRenderMedia();
     });
   }
 
-  // 8. Quick Add Modal & Code Generator
+  if (searchClearBtn) {
+    searchClearBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      searchQuery = "";
+      searchClearBtn.style.display = "none";
+      searchInput.focus();
+      filterAndRenderMedia();
+    });
+  }
+
+  // 11. Quick Add Modal & Code Generator
   function openQuickAdd() {
     if (quickAddModal) {
       quickAddModal.classList.add("active");
@@ -454,7 +594,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (quickAddForm) {
     quickAddForm.addEventListener("input", updateCodeSnippet);
 
-    // Live preview local file upload
     const localFileInput = document.getElementById("addLocalFile");
     if (localFileInput) {
       localFileInput.addEventListener("change", (e) => {
@@ -473,7 +612,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Submit form (Live preview in gallery)
     quickAddForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const title = document.getElementById("addTitle").value || "Yeni Eser";
@@ -499,17 +637,13 @@ document.addEventListener("DOMContentLoaded", () => {
         featured: true
       };
 
-      // Add to front of MEDIA_ITEMS
       MEDIA_ITEMS.unshift(newItem);
       filterAndRenderMedia();
       closeQuickAdd();
-
-      // Notification
       alert("✅ Medya geçici olarak galeriye eklendi! Kalıcı olması için üretilen JSON kodunu 'js/media-data.js' dosyasına ekleyebilirsiniz.");
     });
   }
 
-  // Copy code snippet button
   if (copyCodeBtn && codeSnippetOutput) {
     copyCodeBtn.addEventListener("click", () => {
       navigator.clipboard.writeText(codeSnippetOutput.textContent).then(() => {
@@ -518,6 +652,66 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => (copyCodeBtn.textContent = origText), 2000);
       });
     });
+  }
+
+  // 12. Mobile Bottom Bar Interactions
+  if (bNavHome) {
+    bNavHome.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  if (bNavCatalog) {
+    bNavCatalog.addEventListener("click", (e) => {
+      e.preventDefault();
+      const catSec = document.getElementById("kataloglar");
+      if (catSec) catSec.scrollIntoView({ behavior: "smooth" });
+    });
+  }
+
+  if (bNavAdd) {
+    bNavAdd.addEventListener("click", openQuickAdd);
+  }
+
+  if (bNavVideos) {
+    bNavVideos.addEventListener("click", (e) => {
+      e.preventDefault();
+      currentType = "video";
+      typeToggleBtns.forEach((b) => b.classList.toggle("active", b.dataset.type === "video"));
+      filterAndRenderMedia();
+      const catSec = document.getElementById("kataloglar");
+      if (catSec) catSec.scrollIntoView({ behavior: "smooth" });
+    });
+  }
+
+  if (bNavAbout) {
+    bNavAbout.addEventListener("click", (e) => {
+      e.preventDefault();
+      const aboutSec = document.getElementById("ekipman");
+      if (aboutSec) aboutSec.scrollIntoView({ behavior: "smooth" });
+    });
+  }
+
+  function updateBottomNavActiveState() {
+    const scrollPos = window.scrollY + 200;
+    const catSec = document.getElementById("kataloglar");
+    const aboutSec = document.getElementById("ekipman");
+
+    const bottomItems = document.querySelectorAll(".bottom-nav-item");
+    bottomItems.forEach((it) => it.classList.remove("active"));
+
+    if (aboutSec && scrollPos >= aboutSec.offsetTop) {
+      if (bNavAbout) bNavAbout.classList.add("active");
+    } else if (catSec && scrollPos >= catSec.offsetTop) {
+      if (currentType === "video" && bNavVideos) {
+        bNavVideos.classList.add("active");
+      } else if (bNavCatalog) {
+        bNavCatalog.classList.add("active");
+      }
+    } else {
+      if (bNavHome) bNavHome.classList.add("active");
+    }
   }
 
   // Initial Runs
