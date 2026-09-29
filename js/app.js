@@ -1,0 +1,528 @@
+/**
+ * GOG STUDIO - Ana Uygulama Mantığı (Filtreleme, Lightbox, Video Oynatıcı, Arama)
+ */
+
+document.addEventListener("DOMContentLoaded", () => {
+  // State
+  let currentCategory = "all";
+  let currentType = "all"; // 'all' | 'photo' | 'video'
+  let searchQuery = "";
+  let currentLightboxIndex = -1;
+  let filteredItems = [...MEDIA_ITEMS];
+  let likedItems = JSON.parse(localStorage.getItem("gog_likes") || "[]");
+
+  // DOM Elements
+  const mediaGrid = document.getElementById("mediaGrid");
+  const categoryChipsContainer = document.getElementById("categoryChips");
+  const typeToggleBtns = document.querySelectorAll(".type-toggle-btn");
+  const searchInput = document.getElementById("searchInput");
+  const resultCountEl = document.getElementById("resultCount");
+  const seriesGrid = document.getElementById("seriesGrid");
+  const gearGrid = document.getElementById("gearGrid");
+
+  // Lightbox Elements
+  const lightboxModal = document.getElementById("lightboxModal");
+  const lightboxMediaViewer = document.getElementById("lightboxMediaViewer");
+  const lightboxCloseBtn = document.getElementById("lightboxCloseBtn");
+  const lightboxPrevBtn = document.getElementById("lightboxPrevBtn");
+  const lightboxNextBtn = document.getElementById("lightboxNextBtn");
+  const lightboxTitle = document.getElementById("lightboxTitle");
+  const lightboxDesc = document.getElementById("lightboxDesc");
+  const lightboxCategory = document.getElementById("lightboxCategory");
+  const lightboxGear = document.getElementById("lightboxGear");
+  const lightboxRes = document.getElementById("lightboxRes");
+  const lightboxLocation = document.getElementById("lightboxLocation");
+  const lightboxDate = document.getElementById("lightboxDate");
+  const lightboxTags = document.getElementById("lightboxTags");
+
+  // Quick Add Modal Elements
+  const quickAddModal = document.getElementById("quickAddModal");
+  const openQuickAddBtn = document.getElementById("openQuickAddBtn");
+  const heroAddBtn = document.getElementById("heroAddBtn");
+  const closeQuickAddBtn = document.getElementById("closeQuickAddBtn");
+  const quickAddForm = document.getElementById("quickAddForm");
+  const codeSnippetOutput = document.getElementById("codeSnippetOutput");
+  const copyCodeBtn = document.getElementById("copyCodeBtn");
+
+  // Mobile Navigation
+  const mobileToggle = document.getElementById("mobileToggle");
+  const navMenu = document.getElementById("navMenu");
+
+  // 1. Initialize Header Scroll Effect
+  window.addEventListener("scroll", () => {
+    const header = document.querySelector(".site-header");
+    if (window.scrollY > 30) {
+      header.classList.add("scrolled");
+    } else {
+      header.classList.remove("scrolled");
+    }
+  });
+
+  // Mobile Menu Toggle
+  if (mobileToggle && navMenu) {
+    mobileToggle.addEventListener("click", () => {
+      navMenu.classList.toggle("open");
+    });
+    // Close menu when clicking links
+    navMenu.querySelectorAll(".nav-link").forEach((link) => {
+      link.addEventListener("click", () => navMenu.classList.remove("open"));
+    });
+  }
+
+  // 2. Render Category Filter Chips
+  function renderCategoryChips() {
+    if (!categoryChipsContainer) return;
+    categoryChipsContainer.innerHTML = CATALOG_CATEGORIES.map(
+      (cat) => `
+      <button class="chip-btn ${cat.id === currentCategory ? "active" : ""}" data-category="${cat.id}">
+        <span>${cat.name}</span>
+      </button>
+    `
+    ).join("");
+
+    categoryChipsContainer.querySelectorAll(".chip-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        currentCategory = btn.dataset.category;
+        renderCategoryChips();
+        filterAndRenderMedia();
+      });
+    });
+  }
+
+  // 3. Render Curated Series / Albums
+  function renderCuratedSeries() {
+    if (!seriesGrid) return;
+    seriesGrid.innerHTML = CURATED_ALBUMS.map(
+      (album) => `
+      <div class="series-card" data-category="${album.categoryFilter}">
+        <div class="series-cover">
+          <img src="${album.cover}" alt="${album.title}" loading="lazy">
+          <span class="series-badge">${album.tag}</span>
+        </div>
+        <div class="series-info">
+          <h4>${album.title}</h4>
+          <p>${album.subtitle}</p>
+          <div class="series-footer">
+            <span>${album.count}</span>
+            <span class="series-link">Kataloğu Aç &rarr;</span>
+          </div>
+        </div>
+      </div>
+    `
+    ).join("");
+
+    seriesGrid.querySelectorAll(".series-card").forEach((card) => {
+      card.addEventListener("click", () => {
+        const cat = card.dataset.category;
+        currentCategory = cat || "all";
+        renderCategoryChips();
+        filterAndRenderMedia();
+        // Scroll smoothly to catalog section
+        const catalogSec = document.getElementById("kataloglar");
+        if (catalogSec) {
+          catalogSec.scrollIntoView({ behavior: "smooth" });
+        }
+      });
+    });
+  }
+
+  // 4. Render Studio Gear Specs
+  function renderStudioGear() {
+    if (!gearGrid) return;
+    gearGrid.innerHTML = STUDIO_GEAR.map(
+      (sec) => `
+      <div class="gear-card">
+        <div class="gear-card-title">
+          <span>${sec.category}</span>
+        </div>
+        <ul class="gear-list">
+          ${sec.items.map((it) => `<li>${it}</li>`).join("")}
+        </ul>
+      </div>
+    `
+    ).join("");
+  }
+
+  // 5. Filter & Render Media Grid
+  function filterAndRenderMedia() {
+    filteredItems = MEDIA_ITEMS.filter((item) => {
+      // Category match
+      const matchesCategory =
+        currentCategory === "all" || item.category === currentCategory;
+
+      // Type match
+      const matchesType =
+        currentType === "all" || item.type === currentType;
+
+      // Search match
+      const q = searchQuery.toLowerCase().trim();
+      const matchesSearch =
+        !q ||
+        item.title.toLowerCase().includes(q) ||
+        (item.description && item.description.toLowerCase().includes(q)) ||
+        (item.location && item.location.toLowerCase().includes(q)) ||
+        (item.gear && item.gear.toLowerCase().includes(q)) ||
+        (item.tags && item.tags.some((t) => t.toLowerCase().includes(q)));
+
+      return matchesCategory && matchesType && matchesSearch;
+    });
+
+    if (resultCountEl) {
+      resultCountEl.innerHTML = `Toplam <strong>${filteredItems.length}</strong> eser gösteriliyor`;
+    }
+
+    if (filteredItems.length === 0) {
+      mediaGrid.innerHTML = `
+        <div class="no-results">
+          <div class="no-results-icon">&#9888;</div>
+          <h3>Aradığınız kriterde medya bulunamadı</h3>
+          <p style="color: var(--color-gray-400); margin-top: 8px;">
+            Farklı bir kategori seçebilir veya arama teriminizi temizleyebilirsiniz.
+          </p>
+          <button class="btn btn-outline btn-sm" id="resetFilterBtn" style="margin-top: 20px;">
+            Filtreleri Sıfırla
+          </button>
+        </div>
+      `;
+      const resetBtn = document.getElementById("resetFilterBtn");
+      if (resetBtn) {
+        resetBtn.addEventListener("click", () => {
+          currentCategory = "all";
+          currentType = "all";
+          searchQuery = "";
+          if (searchInput) searchInput.value = "";
+          typeToggleBtns.forEach((b) =>
+            b.classList.toggle("active", b.dataset.type === "all")
+          );
+          renderCategoryChips();
+          filterAndRenderMedia();
+        });
+      }
+      return;
+    }
+
+    mediaGrid.innerHTML = filteredItems
+      .map((item, index) => {
+        const isLiked = likedItems.includes(item.id);
+        const categoryObj = CATALOG_CATEGORIES.find((c) => c.id === item.category);
+        const categoryName = categoryObj ? categoryObj.name : item.category;
+
+        return `
+        <article class="media-card ${item.type === "video" ? "video-card" : ""}" data-id="${item.id}" data-index="${index}">
+          <div class="media-preview-wrap">
+            <img src="${item.thumbnail || item.src}" alt="${item.title}" class="media-img" loading="lazy" />
+            
+            <div class="card-badge-top-left">
+              <span class="category-tag">${categoryName}</span>
+              <span class="type-indicator ${item.type}">
+                ${item.type === "video" ? `&#9658; ${item.duration || "Video"}` : "Foto"}
+              </span>
+            </div>
+
+            <button class="card-like-btn ${isLiked ? "liked" : ""}" data-id="${item.id}" title="Favorilere Ekle" aria-label="Favori">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="${isLiked ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </button>
+
+            ${
+              item.type === "video"
+                ? `
+              <div class="video-play-overlay">
+                <div class="play-circle">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                </div>
+              </div>
+            `
+                : ""
+            }
+          </div>
+
+          <div class="media-card-body">
+            <h3 class="media-card-title">${item.title}</h3>
+            <p class="media-card-desc">${item.description || ""}</p>
+            <div class="media-card-meta">
+              <span class="media-gear">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+                ${item.gear || item.resolution || "GOG Studio"}
+              </span>
+              <span>${item.date || "2026"}</span>
+            </div>
+          </div>
+        </article>
+      `;
+      })
+      .join("");
+
+    // Attach Click Handlers to cards & likes
+    mediaGrid.querySelectorAll(".media-card").forEach((card) => {
+      card.addEventListener("click", (e) => {
+        // Prevent opening lightbox if like button was clicked
+        if (e.target.closest(".card-like-btn")) return;
+        const index = parseInt(card.dataset.index, 10);
+        openLightbox(index);
+      });
+    });
+
+    mediaGrid.querySelectorAll(".card-like-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        toggleLike(id);
+        const isNowLiked = likedItems.includes(id);
+        btn.classList.toggle("liked", isNowLiked);
+        const svg = btn.querySelector("svg");
+        if (svg) svg.setAttribute("fill", isNowLiked ? "currentColor" : "none");
+      });
+    });
+  }
+
+  // Toggle Like with LocalStorage
+  function toggleLike(id) {
+    if (likedItems.includes(id)) {
+      likedItems = likedItems.filter((i) => i !== id);
+    } else {
+      likedItems.push(id);
+    }
+    localStorage.setItem("gog_likes", JSON.stringify(likedItems));
+  }
+
+  // 6. Lightbox Modal Functionality
+  function openLightbox(index) {
+    if (index < 0 || index >= filteredItems.length) return;
+    currentLightboxIndex = index;
+    const item = filteredItems[index];
+
+    // Render media in viewer
+    if (item.type === "video") {
+      lightboxMediaViewer.innerHTML = `
+        <video controls autoplay loop playsinline style="max-height: 80vh; max-width: 95%;">
+          <source src="${item.src}" type="video/mp4">
+          Tarayıcınız video etiketini desteklemiyor.
+        </video>
+      `;
+    } else {
+      lightboxMediaViewer.innerHTML = `
+        <img src="${item.src}" alt="${item.title}" style="max-height: 85vh; max-width: 95%; object-fit: contain;" />
+      `;
+    }
+
+    // Populate Sidebar Details
+    const catObj = CATALOG_CATEGORIES.find((c) => c.id === item.category);
+    lightboxCategory.textContent = catObj ? catObj.name : item.category;
+    lightboxTitle.textContent = item.title;
+    lightboxDesc.textContent = item.description || "GOG Studio özel katalog çalışması.";
+    lightboxGear.textContent = item.gear || "Belirtilmemiş";
+    lightboxRes.textContent = item.resolution || (item.type === "video" ? "4K Video" : "Yüksek Çözünürlük");
+    lightboxLocation.textContent = item.location || "İstanbul / Studio";
+    lightboxDate.textContent = item.date || "2026";
+
+    // Tags
+    if (item.tags && item.tags.length > 0) {
+      lightboxTags.innerHTML = item.tags
+        .map((t) => `<span class="tag-badge">#${t}</span>`)
+        .join("");
+    } else {
+      lightboxTags.innerHTML = `<span class="tag-badge">#GOGStudio</span>`;
+    }
+
+    lightboxModal.classList.add("active");
+    document.body.style.overflow = "hidden"; // Prevent background scroll
+  }
+
+  function closeLightbox() {
+    lightboxModal.classList.remove("active");
+    lightboxMediaViewer.innerHTML = ""; // Stop video playback
+    document.body.style.overflow = "";
+    currentLightboxIndex = -1;
+  }
+
+  function showNextLightbox() {
+    if (currentLightboxIndex < filteredItems.length - 1) {
+      openLightbox(currentLightboxIndex + 1);
+    } else {
+      openLightbox(0); // loop
+    }
+  }
+
+  function showPrevLightbox() {
+    if (currentLightboxIndex > 0) {
+      openLightbox(currentLightboxIndex - 1);
+    } else {
+      openLightbox(filteredItems.length - 1); // loop
+    }
+  }
+
+  // Lightbox Event Listeners
+  if (lightboxCloseBtn) lightboxCloseBtn.addEventListener("click", closeLightbox);
+  if (lightboxNextBtn) lightboxNextBtn.addEventListener("click", showNextLightbox);
+  if (lightboxPrevBtn) lightboxPrevBtn.addEventListener("click", showPrevLightbox);
+
+  // Close lightbox on backdrop click
+  if (lightboxModal) {
+    lightboxModal.addEventListener("click", (e) => {
+      if (e.target === lightboxModal) {
+        closeLightbox();
+      }
+    });
+  }
+
+  // Keyboard navigation
+  window.addEventListener("keydown", (e) => {
+    if (!lightboxModal.classList.contains("active")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowRight") showNextLightbox();
+    if (e.key === "ArrowLeft") showPrevLightbox();
+  });
+
+  // 7. Event Listeners for Filters
+  typeToggleBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      typeToggleBtns.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentType = btn.dataset.type;
+      filterAndRenderMedia();
+    });
+  });
+
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      searchQuery = e.target.value;
+      filterAndRenderMedia();
+    });
+  }
+
+  // 8. Quick Add Modal & Code Generator
+  function openQuickAdd() {
+    if (quickAddModal) {
+      quickAddModal.classList.add("active");
+      document.body.style.overflow = "hidden";
+      updateCodeSnippet();
+    }
+  }
+
+  function closeQuickAdd() {
+    if (quickAddModal) {
+      quickAddModal.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+  }
+
+  if (openQuickAddBtn) openQuickAddBtn.addEventListener("click", openQuickAdd);
+  if (heroAddBtn) heroAddBtn.addEventListener("click", openQuickAdd);
+  if (closeQuickAddBtn) closeQuickAddBtn.addEventListener("click", closeQuickAdd);
+
+  if (quickAddModal) {
+    quickAddModal.addEventListener("click", (e) => {
+      if (e.target === quickAddModal) closeQuickAdd();
+    });
+  }
+
+  function updateCodeSnippet() {
+    if (!quickAddForm || !codeSnippetOutput) return;
+    const title = document.getElementById("addTitle").value || "Yeni Eser";
+    const type = document.getElementById("addType").value || "photo";
+    const category = document.getElementById("addCategory").value || "street";
+    const src = document.getElementById("addSrc").value || "assets/media/ornek.jpg";
+    const gear = document.getElementById("addGear").value || "Sony A7 IV";
+    const desc = document.getElementById("addDesc").value || "Çekim açıklaması...";
+
+    const sampleObj = {
+      id: "gog-" + Date.now().toString().slice(-4),
+      title: title,
+      description: desc,
+      category: category,
+      type: type,
+      src: src,
+      thumbnail: src,
+      date: new Date().toISOString().slice(0, 7),
+      gear: gear,
+      resolution: type === "video" ? "4K 60FPS" : "33MP RAW",
+      location: "İstanbul, TR",
+      tags: [category, type],
+      featured: true
+    };
+
+    codeSnippetOutput.textContent = JSON.stringify(sampleObj, null, 2) + ",";
+  }
+
+  if (quickAddForm) {
+    quickAddForm.addEventListener("input", updateCodeSnippet);
+
+    // Live preview local file upload
+    const localFileInput = document.getElementById("addLocalFile");
+    if (localFileInput) {
+      localFileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const blobUrl = URL.createObjectURL(file);
+          document.getElementById("addSrc").value = blobUrl;
+          document.getElementById("addTitle").value = file.name.replace(/\.[^/.]+$/, "");
+          if (file.type.startsWith("video")) {
+            document.getElementById("addType").value = "video";
+          } else {
+            document.getElementById("addType").value = "photo";
+          }
+          updateCodeSnippet();
+        }
+      });
+    }
+
+    // Submit form (Live preview in gallery)
+    quickAddForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const title = document.getElementById("addTitle").value || "Yeni Eser";
+      const type = document.getElementById("addType").value;
+      const category = document.getElementById("addCategory").value;
+      const src = document.getElementById("addSrc").value || "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=1200&q=80";
+      const gear = document.getElementById("addGear").value || "Özel Kamera";
+      const desc = document.getElementById("addDesc").value || "Yeni eklenen medya.";
+
+      const newItem = {
+        id: "user-" + Date.now(),
+        title: title,
+        description: desc,
+        category: category,
+        type: type,
+        src: src,
+        thumbnail: src,
+        date: new Date().toISOString().slice(0, 7),
+        gear: gear,
+        resolution: "Custom",
+        location: "Kişisel Arşiv",
+        tags: ["Yeni", category],
+        featured: true
+      };
+
+      // Add to front of MEDIA_ITEMS
+      MEDIA_ITEMS.unshift(newItem);
+      filterAndRenderMedia();
+      closeQuickAdd();
+
+      // Notification
+      alert("✅ Medya geçici olarak galeriye eklendi! Kalıcı olması için üretilen JSON kodunu 'js/media-data.js' dosyasına ekleyebilirsiniz.");
+    });
+  }
+
+  // Copy code snippet button
+  if (copyCodeBtn && codeSnippetOutput) {
+    copyCodeBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText(codeSnippetOutput.textContent).then(() => {
+        const origText = copyCodeBtn.textContent;
+        copyCodeBtn.textContent = "✓ Kopyalandı!";
+        setTimeout(() => (copyCodeBtn.textContent = origText), 2000);
+      });
+    });
+  }
+
+  // Initial Runs
+  renderCategoryChips();
+  renderCuratedSeries();
+  renderStudioGear();
+  filterAndRenderMedia();
+});

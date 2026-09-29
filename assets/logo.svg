@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" fill="none">
+  <defs>
+    <linearGradient id="gogRed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF2A3B" />
+      <stop offset="100%" stop-color="#B91C1C" />
+    </linearGradient>
+    <filter id="redGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Geometric Symbol / Shutter & G Monogram -->
+  <g transform="translate(10, 10)">
+    <!-- Outer framing circle/octagon (gray & red accent) -->
+    <rect x="5" y="5" width="70" height="70" rx="16" fill="#141418" stroke="#26262E" stroke-width="2"/>
+    
+    <!-- Red Accent Corner mark -->
+    <path d="M 60 5 L 75 5 Q 75 20 75 20" stroke="url(#gogRed)" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    <circle cx="68" cy="12" r="3.5" fill="#FF2A3B" filter="url(#redGlow)"/>
+
+    <!-- Geometric Stylized 'G' Lens Shutter -->
+    <path d="M 52 26 C 47 21 39 19 32 21 C 22 24 16 33 16 43 C 16 54 24 62 35 62 C 46 62 54 55 55 44 L 36 44" 
+          stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    
+    <!-- Central Red Aperture Core -->
+    <circle cx="36" cy="40" r="4.5" fill="#FF2A3B"/>
+  </g>
+
+  <!-- Typography: GOG STUDIO -->
+  <!-- "GOG" in bold white modern font -->
+  <text x="100" y="56" font-family="'Space Grotesk', 'Inter', -apple-system, sans-serif" font-size="38" font-weight="900" letter-spacing="4" fill="#FFFFFF">GOG</text>
+  
+  <!-- Red Dot Accent between GOG and STUDIO -->
+  <circle cx="206" cy="46" r="4" fill="#FF2A3B" filter="url(#redGlow)"/>
+
+  <!-- "STUDIO" in tracking gray/white uppercase font -->
+  <text x="222" y="56" font-family="'Space Grotesk', 'Inter', -apple-system, sans-serif" font-size="36" font-weight="400" letter-spacing="8" fill="#E4E4E7">STUDIO</text>
+
+  <!-- Sub-label: VISUAL ARCHIVE -->
+  <text x="103" y="76" font-family="'Inter', sans-serif" font-size="10" font-weight="600" letter-spacing="5" fill="#8E8E93">PHOTO &amp; VIDEO ARCHIVE</text>
+</svg>
