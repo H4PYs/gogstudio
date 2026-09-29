@@ -211,14 +211,6 @@ h1, h2, h3, h4, .brand-font {
   flex-shrink: 0;
 }
 
-.btn-text-desktop {
-  display: inline;
-}
-
-.btn-text-mobile {
-  display: none;
-}
-
 .nav-add-btn {
   white-space: nowrap;
   display: inline-flex;
@@ -1789,16 +1781,9 @@ h1, h2, h3, h4, .brand-font {
   }
 
   /* Completely remove the bulky ARŞİV AKTİF badge on mobile so Medya Ekle has room */
-  .pulse-badge {
+  .pulse-badge,
+  .desktop-only {
     display: none !important;
-  }
-
-  .btn-text-desktop {
-    display: none !important;
-  }
-
-  .btn-text-mobile {
-    display: inline !important;
   }
 
   .nav-add-btn {
