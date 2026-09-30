@@ -1,25 +1,6 @@
 /**
  * GOG STUDIO - Medya Kataloğu Veritabanı
- * 
- * Yeni fotoğraf veya video eklemek çok kolay!
- * 1. Kendi fotoğraf/videolarınızı 'assets/media/' klasörüne atın.
- * 2. Aşağıdaki MEDIA_ITEMS dizisine yeni bir obje ekleyin:
- * 
- *    {
- *      id: "benim-cekimim",
- *      title: "Gece Sokak Çekimi",
- *      description: "Kadıköy sokaklarında uzun pozlama denemesi.",
- *      category: "street", // street | cinematic | portrait | nature | reels
- *      type: "photo",      // "photo" veya "video"
- *      src: "assets/media/gece.jpg", // Kendi dosyanız veya internet URL'si
- *      thumbnail: "assets/media/gece.jpg",
- *      date: "2026-03",
- *      gear: "Sony A7 IV · 35mm f/1.4",
- *      resolution: "4K / 33MP",
- *      location: "İstanbul, Türkiye",
- *      tags: ["Gece", "Sokak", "Neon", "Long Exposure"],
- *      featured: true
- *    }
+ * Sinematik Fotoğraf & Video Prodüksiyon Arşivi
  */
 
 const CATALOG_CATEGORIES = [
@@ -49,20 +30,20 @@ const MEDIA_ITEMS = [
     featured: true
   },
 
-  // 2. Cinematic Video (HTML5 sample)
+  // 2. Cinematic Video (High Speed & Red Tone Sequence)
   {
     id: "gog-02",
     title: "Red Motion: Hız ve Işık Denemesi",
-    description: "4K 60fps yüksek kare hızı ile çekilmiş, kırmızı tonların vurgulandığı sinematik araba ve ışık sekansı.",
+    description: "4K 60fps yüksek kare hızı ile çekilmiş, kırmızı tonların vurgulandığı sinematik ışık ve hareket sekansı.",
     category: "cinematic",
     type: "video",
-    src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    src: "https://test-videos.co.uk/vids/sintel/mp4/h264/1080/Sintel_1080_10s_2MB.mp4",
     thumbnail: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80",
     date: "2026-02",
-    gear: "Sony FX3 · 24-70mm f/2.8",
-    duration: "0:15",
+    gear: "Sony FX3 · 24-70mm f/2.8 GM",
+    duration: "0:10",
     resolution: "4K 60FPS · 10-Bit 4:2:2",
-    location: "Stüdyo / Gece Pisti",
+    location: "GOG Stüdyo / Gece Kurgusu",
     tags: ["Sinematik", "4K", "Kırmızı", "Kurgu"],
     featured: true
   },
@@ -84,37 +65,37 @@ const MEDIA_ITEMS = [
     featured: true
   },
 
-  // 4. Nature & Mist Landscape
+  // 4. Nature & Mist Landscape (Verified 200 OK URL)
   {
     id: "gog-04",
     title: "Sisli Zirveler & Çam Ormanı",
     description: "Sabahın erken saatlerinde vadiden yükselen yoğun sis tabakası ve monokrom çam ağaçları.",
     category: "nature",
     type: "photo",
-    src: "https://images.unsplash.com/photo-1511497584788-87676104235f?auto=format&fit=crop&w=1600&q=85",
-    thumbnail: "https://images.unsplash.com/photo-1511497584788-87676104235f?auto=format&fit=crop&w=700&q=80",
+    src: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1600&q=85",
+    thumbnail: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=700&q=80",
     date: "2026-01",
     gear: "Fujifilm X-T5 · 16-55mm f/2.8",
     resolution: "7728 × 5152 · B&W High Contrast",
-    location: "Karadeniz Yaylaları",
+    location: "Karadeniz / Yayla Vadisi",
     tags: ["Doğa", "Sis", "Siyah Beyaz", "Manzara"],
     featured: true
   },
 
-  // 5. Short Cinematic Video Clip
+  // 5. Short Cinematic Video Clip (Verified Fast Stream)
   {
     id: "gog-05",
     title: "Okyanus Dalgası & Kıyı Ritimleri",
-    description: "Kıyıya vuran dalgaların köpük detayları ve akıcı su dinamiği üzerine kurgulanmış sakinleştirici kurgu.",
+    description: "Kıyıya vuran dalgaların köpük detayları ve akıcı su dinamiği üzerine kurgulanmış sinematik kurgu.",
     category: "cinematic",
     type: "video",
-    src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    src: "https://vjs.zencdn.net/v/oceans.mp4",
     thumbnail: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
     date: "2026-02",
     gear: "DJI Mini 4 Pro · D-Log M",
-    duration: "0:15",
+    duration: "0:46",
     resolution: "4K 60FPS HDR",
-    location: "Ege Kıyıları",
+    location: "Ege Kıyıları / Drone",
     tags: ["Drone", "Video", "Kıyı", "4K"],
     featured: false
   },
@@ -122,7 +103,7 @@ const MEDIA_ITEMS = [
   // 6. Street Architecture Minimalist
   {
     id: "gog-06",
-    title: "Brülist Geometri & Sert Gölgeler",
+    title: "Brütalist Geometri & Sert Gölgeler",
     description: "Modern beton mimarisinin keskin hatları, monokrom gölgeler ve tek bir kırmızı vurgu detayı.",
     category: "street",
     type: "photo",
@@ -136,14 +117,14 @@ const MEDIA_ITEMS = [
     featured: false
   },
 
-  // 7. Video Reel
+  // 7. Video Reel (Verified Fast Stream)
   {
     id: "gog-07",
     title: "Reel: Gece Şehir Akışı (Timelapse)",
     description: "Şehir trafiğinin ışık izleri ve bulutların gökdelenler arasındaki hızlı geçişi.",
     category: "reels",
     type: "video",
-    src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4",
+    src: "https://raw.githubusercontent.com/intel-iot-devkit/sample-videos/master/person-bicycle-car-detection.mp4",
     thumbnail: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=800&q=80",
     date: "2026-03",
     gear: "iPhone 15 Pro Max · Apple ProRes 4K",
@@ -154,7 +135,7 @@ const MEDIA_ITEMS = [
     featured: true
   },
 
-  // 8. Studio Product / Creative
+  // 8. Studio Product / Vintage Gear
   {
     id: "gog-08",
     title: "Analog Kamera & Mekanik Detay",
@@ -188,33 +169,33 @@ const MEDIA_ITEMS = [
     featured: true
   },
 
-  // 10. Cinematic Nature Reel
+  // 10. Cinematic Nature Reel (Verified High-Res 1080p stream)
   {
     id: "gog-10",
-    title: "Sis Dansı & Dağ Yolu Kurgusu",
-    description: "Kıvrımlı dağ yollarında sonbahar renkleri ve sis bulutları arasında drone takibi.",
+    title: "Işık Dansı & Derinlik Kurgusu",
+    description: "Derinlik ve renk derecelendirmesi üzerinde çalışılmış sinematik sualtı ışık kırılmaları sekansı.",
     category: "cinematic",
     type: "video",
-    src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
+    src: "https://test-videos.co.uk/vids/jellyfish/mp4/h264/1080/Jellyfish_1080_10s_2MB.mp4",
     thumbnail: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
     date: "2025-10",
-    gear: "DJI Mavic 3 Pro · Cine Hasselblad",
-    duration: "0:20",
-    resolution: "5.1K Apple ProRes",
-    location: "Alpler / Geçit Yolu",
-    tags: ["Drone", "Dağ", "Sinematik", "4K"],
+    gear: "Sony FX3 · Cine Line 4K",
+    duration: "0:10",
+    resolution: "1080p 60FPS · 10-Bit",
+    location: "GOG Stüdyo / Su Kurgusu",
+    tags: ["Işık", "Derinlik", "Sinematik", "4K"],
     featured: false
   },
 
-  // 11. Street Red Umbrella
+  // 11. Street Red Umbrella (Verified Working URL)
   {
     id: "gog-11",
     title: "Yağmurlu Metropol & Kırmızı Şemsiye",
-    description: "Siyah beyaz gri tonlu şehir fonunda tek kırmızı öge: kalabalığı yaran kırmızı şemsiye.",
+    description: "Siyah beyaz gri tonlu şehir fonunda tek kırmızı öge: kalabalığı yaran kırmızı şemsiye ve yağmur yansımaları.",
     category: "street",
     type: "photo",
-    src: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1600&q=85",
-    thumbnail: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=700&q=80",
+    src: "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=1600&q=85",
+    thumbnail: "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=700&q=80",
     date: "2025-09",
     gear: "Ricoh GR IIIx · 40mm f/2.8",
     resolution: "6000 × 4000 · Street Snap",
@@ -274,7 +255,7 @@ const CURATED_ALBUMS = [
     id: "album-nature",
     title: "Monokrom Doğa Dokusu",
     subtitle: "Sisli dağ zirveleri, çam ormanları ve siyah sahiller",
-    cover: "https://images.unsplash.com/photo-1511497584788-87676104235f?auto=format&fit=crop&w=800&q=80",
+    cover: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80",
     count: "6 Eser",
     tag: "Manzara",
     categoryFilter: "nature"

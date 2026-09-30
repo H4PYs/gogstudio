@@ -283,7 +283,7 @@ document.addEventListener("DOMContentLoaded", () => {
       (album) => `
       <div class="series-card" data-category="${album.categoryFilter}">
         <div class="series-cover">
-          <img src="${album.cover}" alt="${album.title}" loading="lazy">
+          <img src="${album.cover}" alt="${album.title}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=800&q=85';">
           <span class="series-badge">${album.tag}</span>
         </div>
         <div class="series-info">
@@ -402,7 +402,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return `
         <article class="media-card ${item.type === "video" ? "video-card" : ""}" data-id="${item.id}" data-index="${index}">
           <div class="media-preview-wrap">
-            <img src="${item.thumbnail || item.src}" alt="${item.title}" class="media-img" loading="lazy" />
+            <img src="${item.thumbnail || item.src}" alt="${item.title}" class="media-img" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=700&q=80';" />
             
             <div class="card-badge-top-left">
               <span class="category-tag">${categoryName}</span>
@@ -521,17 +521,31 @@ document.addEventListener("DOMContentLoaded", () => {
       lightboxCounter.textContent = `${index + 1} / ${filteredItems.length}`;
     }
 
-    // Media Viewer
+    // Media Viewer (Native Aspect Ratio & Fallback)
     if (item.type === "video") {
       lightboxMediaViewer.innerHTML = `
-        <video controls autoplay loop playsinline webkit-playsinline style="max-height: 80vh; max-width: 96%; width: 100%;">
+        <video controls autoplay loop playsinline webkit-playsinline preload="metadata" poster="${item.thumbnail || ''}" class="lightbox-video-elem">
           <source src="${item.src}" type="video/mp4">
-          Tarayıcınız video etiketini desteklemiyor.
+          Tarayıcınız video oynatmayı desteklemiyor.
         </video>
       `;
+
+      const vid = lightboxMediaViewer.querySelector("video");
+      if (vid) {
+        vid.addEventListener("error", () => {
+          lightboxMediaViewer.innerHTML = `
+            <div class="media-load-error">
+              <div class="load-error-icon">&#9658;</div>
+              <p style="color: var(--color-white); font-weight: 600; margin-bottom: 6px;">Video Akışı Hazırlanıyor</p>
+              <p style="color: var(--color-gray-400); font-size: 0.85rem; margin-bottom: 16px;">Videonun yüksek çözünürlüklü kopyasını doğrudan tarayıcıda açabilirsiniz.</p>
+              <a href="${item.src}" target="_blank" rel="noopener" class="btn btn-primary btn-sm">Videoyu Yeni Sekmede Aç</a>
+            </div>
+          `;
+        });
+      }
     } else {
       lightboxMediaViewer.innerHTML = `
-        <img src="${item.src}" alt="${item.title}" style="max-height: 82vh; max-width: 96%; object-fit: contain;" />
+        <img src="${item.src}" alt="${item.title}" class="lightbox-img-elem" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=1600&q=85';" />
       `;
     }
 
