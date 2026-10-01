@@ -2929,3 +2929,21 @@ body {
 .bottom-add-circle svg {
   color: #FFFFFF !important;
 }
+
+/* ==========================================================================
+   ULTIMATE LOGO & HEADER MATCH (v14)
+   ========================================================================== */
+
+/* Force header to be perfectly opaque cream to match body */
+.site-header {
+  background: #F7F5F0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02) !important;
+}
+
+/* Multiply the logo to completely remove its white background */
+.brand-logo-img {
+  mix-blend-mode: multiply !important;
+}
+
