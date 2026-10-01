@@ -154,7 +154,7 @@ h1, h2, h3, h4, .brand-font {
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1005;
   background: var(--bg-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -381,17 +381,15 @@ h1, h2, h3, h4, .brand-font {
   transform: translateY(-6px) rotate(-45deg);
 }
 
-/* Drawer Backdrop Overlay */
+/* Drawer Backdrop Overlay (Sharp, No Blur) */
 .mobile-drawer-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 998;
+  z-index: 1000;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
 .mobile-drawer-overlay.active {
@@ -1853,9 +1851,23 @@ h1, h2, h3, h4, .brand-font {
     padding: 0 16px;
   }
 
-  /* Header on Mobile */
+  /* Eliminate all blurs on mobile for razor-sharp rendering & high performance */
+  .bg-ambient-glow,
+  .bg-ambient-glow-bottom {
+    display: none !important;
+  }
+
+  /* Header on Mobile: Solid, Crisp, Always on top of overlay (z-index: 1005) */
+  .site-header {
+    z-index: 1005 !important;
+    background: #09090d !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-bottom: 1px solid #1c1c26 !important;
+  }
+
   .nav-content {
-    height: 60px;
+    height: 58px;
     padding: 0 16px;
     gap: 8px;
     justify-content: space-between;
@@ -1864,6 +1876,7 @@ h1, h2, h3, h4, .brand-font {
   .brand-logo-img {
     height: 32px;
     max-width: 165px;
+    filter: none !important;
   }
 
   /* Completely remove the bulky ARŞİV AKTİF badge on mobile so Medya Ekle has room */
@@ -1901,7 +1914,15 @@ h1, h2, h3, h4, .brand-font {
     margin: 0 !important;
   }
 
-  /* Mobile Drawer Menu (Off-canvas from Right) */
+  /* Mobile Drawer Overlay: Zero Blur, Sits under header */
+  .mobile-drawer-overlay {
+    z-index: 1000 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(0, 0, 0, 0.72) !important;
+  }
+
+  /* Mobile Drawer Menu (Solid Obsidian, Zero Blur, Sits under header at z-index 1004) */
   .nav-menu {
     position: fixed;
     top: 0;
@@ -1910,15 +1931,15 @@ h1, h2, h3, h4, .brand-font {
     max-width: 85vw;
     height: 100vh;
     height: 100dvh;
-    background: rgba(14, 14, 18, 0.98);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    border-left: 1px solid var(--border-subtle);
+    background: #0e0e14 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-left: 1px solid #22222d;
     padding: 24px 20px;
     flex-direction: column;
     align-items: stretch;
-    gap: 14px;
-    z-index: 1000;
+    gap: 12px;
+    z-index: 1004;
     transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: none;
     overflow-y: auto;
@@ -1926,7 +1947,7 @@ h1, h2, h3, h4, .brand-font {
 
   .nav-menu.open {
     right: 0;
-    box-shadow: -15px 0 40px rgba(0, 0, 0, 0.85);
+    box-shadow: -15px 0 40px rgba(0, 0, 0, 0.95);
   }
 
   .mobile-drawer-header {
@@ -1935,43 +1956,90 @@ h1, h2, h3, h4, .brand-font {
     align-items: center;
     padding-bottom: 16px;
     border-bottom: 1px solid var(--border-subtle);
-    margin-bottom: 6px;
+    margin-bottom: 4px;
   }
 
-  .drawer-title {
+  .drawer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .drawer-brand-name {
     font-family: var(--font-heading);
-    font-weight: 800;
-    font-size: 1.15rem;
+    font-weight: 900;
+    font-size: 1.25rem;
     letter-spacing: 2px;
-    color: var(--color-white);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .drawer-brand-name::after {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-red);
+    box-shadow: 0 0 10px rgba(255, 42, 59, 0.7);
+  }
+
+  .drawer-brand-sub {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--color-gray-400);
+    text-transform: uppercase;
   }
 
   .drawer-close-btn {
-    background: transparent;
-    border: none;
-    color: var(--color-gray-400);
-    font-size: 1.8rem;
+    background: #181822;
+    border: 1px solid #262634;
+    color: #ffffff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
     cursor: pointer;
     line-height: 1;
+    transition: all 0.2s ease;
+  }
+
+  .drawer-close-btn:active {
+    background: var(--color-red);
+    border-color: var(--color-red);
   }
 
   .nav-link {
-    font-size: 1.05rem;
-    padding: 12px 14px;
+    font-size: 1.02rem;
+    padding: 13px 16px;
     border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.03);
+    background: #14141c;
+    border: 1px solid #1e1e28;
+    color: #f4f4f6;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    transition: all 0.2s ease;
   }
 
   .nav-link .nav-icon {
     display: inline-block;
-    margin-right: 8px;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
   }
 
   .nav-link:active,
   .nav-link:hover {
-    background: var(--bg-card-hover);
-    color: var(--color-white);
+    background: rgba(255, 42, 59, 0.15);
+    border-color: rgba(255, 42, 59, 0.4);
+    color: #ffffff;
+    transform: translateX(4px);
   }
 
   .mobile-drawer-footer {
@@ -2253,9 +2321,35 @@ h1, h2, h3, h4, .brand-font {
     gap: 28px;
   }
 
-  /* Mobile Bottom App Bar Activated */
+  /* Mobile Bottom App Bar Activated (Sharp, No Blur) */
   .mobile-bottom-bar {
     display: flex;
+    background: #09090d !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-top: 1px solid #1c1c26 !important;
+  }
+
+  /* Remove all blur from chips, badges, and modals on mobile for crisp text */
+  .series-badge,
+  .category-tag,
+  .type-indicator,
+  .card-like-btn,
+  .modal-card,
+  .lightbox-modal {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .card-like-btn {
+    background: #181822 !important;
+    border: 1px solid #282836 !important;
+  }
+
+  .series-badge,
+  .category-tag {
+    background: #14141c !important;
+    border: 1px solid #282836 !important;
   }
 }
 
