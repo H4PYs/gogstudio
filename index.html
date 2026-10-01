@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Custom Stylesheet (with cache-buster v11.0) -->
+  <!-- Custom Stylesheet (with cache-buster v12.0) -->
   <link rel="stylesheet" href="css/style.css?v=5.0">
 </head>
 <body>
@@ -542,13 +542,13 @@
     </a>
 
     <!-- Center Highlighted Add Button -->
-    <button class="bottom-nav-add-btn" id="bNavAdd" class="admin-only" aria-label="Yeni Medya Ekle">
+    <button class="bottom-nav-add-btn admin-only" id="bNavAdd" aria-label="Yeni Medya Ekle">
       <div class="bottom-add-circle">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-      </div>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+        </div>
     </button>
 
     <button class="bottom-nav-item" id="bNavVideos" data-target="videos">
@@ -645,6 +645,7 @@
   <script src="js/app.js?v=4.1"></script>
 </body>
 </html>
+
 
 
 

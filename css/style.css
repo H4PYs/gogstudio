@@ -2894,3 +2894,16 @@ textarea::placeholder,
   color: #B53628 !important;
 }
 
+
+/* ==========================================================================
+   FINAL MOBILE NAV BLACKOUT FIX (v12)
+   ========================================================================== */
+
+/* The actual ID and class of the bottom nav was .mobile-bottom-bar ! */
+@media (max-width: 768px) {
+  .mobile-bottom-bar,
+  #mobileBottomBar {
+    background: #FFFFFF !important;
+    border-top: 1px solid #E6DED5 !important;
+  }
+}
