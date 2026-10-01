@@ -2831,3 +2831,66 @@ body::before, body::after {
   color: #5A5048 !important;
 }
 
+
+/* ==========================================================================
+   FINAL BUG & MODAL CLEANUPS (Light Theme Completion)
+   ========================================================================== */
+
+/* Fix Lightbox Modal Backgrounds */
+.lightbox-media-viewer {
+  background: #F7F5F0 !important; /* Cream instead of pitch black */
+}
+
+.lightbox-counter, 
+.lightbox-close-btn,
+.lightbox-nav-btn {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #2A2A2A !important;
+  border: 1px solid #E6DED5 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+}
+
+.lightbox-close-btn:hover,
+.lightbox-nav-btn:hover {
+  background: #FFFFFF !important;
+  color: #B53628 !important; /* Red hover */
+  border-color: #B53628 !important;
+}
+
+/* Fix mobile modal overlays / backgrounds */
+@media (max-width: 768px) {
+  .lightbox-nav-btn {
+    background: rgba(255, 255, 255, 0.95) !important;
+  }
+}
+
+/* Ensure Input Fields and Placeholders are Light Mode */
+input::placeholder, 
+textarea::placeholder, 
+.search-input::placeholder {
+  color: #8C847C !important;
+}
+.form-control, .search-input {
+  background: #FFFFFF !important;
+  color: #2A2A2A !important;
+  border: 1px solid #E6DED5 !important;
+}
+.form-control:focus, .search-input:focus {
+  border-color: #B53628 !important;
+  box-shadow: 0 0 0 3px rgba(181, 54, 40, 0.1) !important;
+}
+
+/* Modal Close Button */
+.modal-close-btn {
+  color: #5A5048 !important;
+}
+.modal-close-btn:hover {
+  color: #B53628 !important;
+}
+
+/* Global Text Selection for aesthetic */
+::selection {
+  background: rgba(181, 54, 40, 0.2) !important; /* Soft pastel red */
+  color: #B53628 !important;
+}
+
