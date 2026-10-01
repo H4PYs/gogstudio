@@ -2707,3 +2707,67 @@ body {
   box-shadow: 0 8px 24px rgba(181, 54, 40, 0.04) !important;
 }
 
+
+/* ==========================================================================
+   PASTEL AESTHETIC & FINAL BLACK REMOVALS
+   ========================================================================== */
+
+/* Fix Series Cards (Kataloglar) */
+.series-card {
+  background: var(--bg-surface) !important;
+}
+.series-card:hover, .series-card:active {
+  box-shadow: 0 12px 25px rgba(181, 54, 40, 0.08) !important;
+}
+
+/* Fix Hero Card Overlay (Make it less pale, only protect the text at bottom) */
+.hero-card-overlay {
+  background: linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.8) 40%, transparent 100%) !important;
+}
+
+/* Fix Media Card Overlay (For regular media cards) */
+.media-card-overlay {
+  background: linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 60%) !important;
+}
+
+/* Fix Tags & Badges to Pastel Aesthetic */
+.category-tag,
+.type-indicator,
+.series-badge {
+  background: #F3EFE9 !important; /* Soft pastel cream/beige */
+  border: 1px solid #E6DED5 !important;
+  color: #5A5048 !important; /* Soft warm gray */
+  font-weight: 600 !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02) !important;
+}
+
+/* Fix Like Button */
+.card-like-btn {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid #E6DED5 !important;
+  color: #B53628 !important; /* Red heart icon */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04) !important;
+}
+.card-like-btn:hover, .card-like-btn:active, .card-like-btn.liked {
+  background: #FFF !important;
+  border-color: #B53628 !important;
+  box-shadow: 0 4px 12px rgba(181, 54, 40, 0.15) !important;
+}
+
+/* Ensure all random background borders in cards are removed */
+.series-info {
+  border-top: 1px solid var(--border-subtle) !important;
+  background: var(--bg-surface) !important;
+}
+
+/* Fix text in series card */
+.series-title {
+  color: #2A2A2A !important;
+  font-family: var(--font-heading) !important;
+}
+.series-desc {
+  color: #6C645C !important;
+}
+.series-meta {
+  color: #8C847C !important;
+}
