@@ -2771,3 +2771,63 @@ body {
 .series-meta {
   color: #8C847C !important;
 }
+
+/* ==========================================================================
+   MOBILE & HERO AESTHETIC REFINEMENT (v10)
+   ========================================================================== */
+
+/* Remove muddy glows on light theme */
+.bg-ambient-glow, .bg-ambient-glow-bottom {
+  display: none !important;
+}
+
+/* Fix Logo mix-blend-mode causing fading on mobile */
+.brand-logo-img {
+  mix-blend-mode: normal !important;
+}
+
+/* Force header to pure white so logo matches perfectly without blend mode */
+.site-header {
+  background: #FFFFFF !important;
+}
+
+/* 
+  FORCE BOTTOM NAV TO BE WHITE ON MOBILE 
+  (Overriding any legacy #000 or #15151c)
+*/
+.bottom-nav {
+  background: #FFFFFF !important;
+  border-top: 1px solid #E6DED5 !important;
+}
+.bottom-nav-item {
+  background: transparent !important;
+  color: #8C847C !important; /* Pastel gray */
+}
+.bottom-nav-item.active {
+  color: #B53628 !important; /* Rust red */
+}
+.bottom-nav-item .icon-wrapper {
+  background: transparent !important;
+}
+.bottom-nav-add-btn {
+  background: #FFFFFF !important;
+  border: 1px solid #E6DED5 !important;
+  box-shadow: 0 -4px 15px rgba(0,0,0,0.02) !important;
+}
+.bottom-add-circle {
+  background: #B53628 !important;
+  color: #FFFFFF !important;
+}
+
+/* Remove any background overlays on body */
+body::before, body::after {
+  display: none !important;
+}
+
+/* Refine hero text spacing */
+.hero-desc {
+  font-size: 1.05rem !important;
+  line-height: 1.6 !important;
+  color: #5A5048 !important;
+}
+
