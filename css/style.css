@@ -2615,3 +2615,29 @@ body {
 .brand-logo-img {
   height: 44px !important;
 }
+
+/* ==========================================================================
+   GRADIENT AND OVERLAY FIXES FOR EDITORIAL THEME
+   ========================================================================== */
+
+/* Remove the black gradient from the About section */
+.about-section {
+  background: var(--bg-main) !important;
+}
+
+/* Make the hero card gradient blend into white/cream instead of black */
+.hero-card-overlay {
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.4) 60%, transparent 100%) !important;
+}
+
+/* Same for normal media cards if they have a gradient overlay */
+.media-card-overlay {
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.2) 60%, transparent 100%) !important;
+}
+
+
+/* Override hero brand gradient */
+.hero-brand-name {
+  background: none !important;
+  -webkit-text-fill-color: initial !important;
+}
