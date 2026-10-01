@@ -2641,3 +2641,69 @@ body {
   background: none !important;
   -webkit-text-fill-color: initial !important;
 }
+
+/* ==========================================================================
+   FINAL BLACKOUT REMOVAL & LOGO BLEND MODE
+   ========================================================================== */
+
+/* Make the logo's white background disappear (mix-blend-mode: multiply) */
+.brand-logo-img {
+  mix-blend-mode: multiply !important;
+  /* Add smooth hover transition */
+  transition: transform 0.3s ease !important;
+}
+.brand-logo-img:hover {
+  transform: scale(1.05) !important;
+}
+
+/* Remove #000 backgrounds from cards and lightboxes */
+.media-card-img-wrapper,
+.media-card .media-preview-wrap {
+  background: var(--bg-surface) !important;
+}
+
+.lightbox-media-viewer img, 
+.lightbox-media-viewer video {
+  background: transparent !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
+}
+
+.code-output-area {
+  background: var(--bg-surface) !important;
+  color: var(--color-white) !important;
+}
+
+/* Remove mobile header and drawer remaining dark colors */
+@media (max-width: 768px) {
+  .site-header {
+    background: rgba(247, 245, 240, 0.95) !important; /* Cream/glass */
+    border-bottom: 1px solid var(--border-subtle) !important;
+  }
+  
+  .drawer-menu {
+    background: var(--bg-main) !important;
+  }
+
+  .nav-content {
+    background: transparent !important;
+  }
+}
+
+/* Soften all black text to dark charcoal for better pastel aesthetic */
+body, h1, h2, h3, h4, h5, h6, .media-title, .brand-font {
+  color: #2A2A2A !important;
+}
+.hero-brand-name {
+  color: #B53628 !important; /* Keep rust red for brand */
+}
+
+/* Make body background explicitly the cream color */
+body {
+  background-color: var(--bg-main) !important;
+}
+
+/* Soft pastel shadow on cards instead of harsh dark shadows */
+.media-card {
+  box-shadow: 0 8px 24px rgba(181, 54, 40, 0.04) !important;
+}
+
