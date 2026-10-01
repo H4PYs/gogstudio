@@ -2907,3 +2907,25 @@ textarea::placeholder,
     border-top: 1px solid #E6DED5 !important;
   }
 }
+
+/* ==========================================================================
+   FINAL SYSTEM THEME FIX (v13)
+   ========================================================================== */
+html {
+  color-scheme: light !important;
+  background-color: #F7F5F0 !important;
+}
+body {
+  background-color: #F7F5F0 !important;
+}
+
+/* Ensure mobile bottom bar icons are perfectly visible */
+.bottom-nav-item svg {
+  color: #8C847C !important;
+}
+.bottom-nav-item.active svg {
+  color: #B53628 !important;
+}
+.bottom-add-circle svg {
+  color: #FFFFFF !important;
+}
