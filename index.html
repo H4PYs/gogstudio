@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
@@ -54,7 +54,7 @@
           <li><a href="#ekipman" class="nav-link"><span class="nav-icon">📷</span><span>Ekipman &amp; Stüdyo</span></a></li>
           <li><a href="#iletisim" class="nav-link"><span class="nav-icon">✉️</span><span>İletişim</span></a></li>
           <li class="mobile-drawer-footer">
-            <button class="btn btn-primary" id="mobileDrawerAddBtn" style="width: 100%;">
+            <button class="btn btn-primary" id="mobileDrawerAddBtn" class="admin-only" style="width: 100%;">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -79,7 +79,7 @@
           <span class="badge-text">ARŞİV AKTİF</span>
         </div>
 
-        <button class="btn btn-primary btn-sm nav-add-btn" id="openQuickAddBtn" title="Kendi medyanızı ekleyin veya kod üretin">
+        <button class="btn btn-primary btn-sm nav-add-btn" id="openQuickAddBtn" class="admin-only" title="Kendi medyanızı ekleyin veya kod üretin">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -533,7 +533,7 @@
     </a>
 
     <!-- Center Highlighted Add Button -->
-    <button class="bottom-nav-add-btn" id="bNavAdd" aria-label="Yeni Medya Ekle">
+    <button class="bottom-nav-add-btn" id="bNavAdd" class="admin-only" aria-label="Yeni Medya Ekle">
       <div class="bottom-add-circle">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -636,3 +636,4 @@
   <script src="js/app.js?v=4.1"></script>
 </body>
 </html>
+

@@ -1,9 +1,19 @@
-/**
+﻿/**
  * GOG STUDIO - Ana Uygulama & Motion Motoru
  * (Lenis Smooth Scroll + GSAP ScrollTrigger + Lightbox + Dokunmatik Hareketler)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Admin Mode (Gizli Butonlar Ä°Ã§in)
+  if (window.location.search.includes("admin=1")) {
+    localStorage.setItem("gog_admin", "true");
+  } else if (window.location.search.includes("admin=0")) {
+    localStorage.removeItem("gog_admin");
+  }
+  if (localStorage.getItem("gog_admin") === "true") {
+    document.body.classList.add("admin-mode");
+  }
+
   // State
   let currentCategory = "all";
   let currentType = "all"; // 'all' | 'photo' | 'video'
@@ -929,3 +939,4 @@ document.addEventListener("DOMContentLoaded", () => {
   filterAndRenderMedia();
   initMotionSequences();
 });
+

@@ -2363,3 +2363,11 @@ h1, h2, h3, h4, .brand-font {
     font-size: 0.74rem;
   }
 }
+
+/* Admin Özel Butonlarını Gizle */
+.admin-only {
+  display: none !important;
+}
+body.admin-mode .admin-only {
+  display: flex !important;
+}
